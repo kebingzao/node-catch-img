@@ -19,6 +19,7 @@
     "ejs": "^2.3.4",
     "express-ejs-layouts": "^2.0.0",
     "q": "^1.4.1",
+    "rimraf": "^2.4.3",
     "underscore": "^1.8.3"
   }
 }
