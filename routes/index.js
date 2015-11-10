@@ -25,7 +25,7 @@ router.get('/catch', function(req, res, next) {
         // 获取数据并下载
         airHelper.getAllImg(data, ".spec-items li img", fileName).then(function(){
           // 接下来是保存
-          airHelper.writeZip(fileName + "/",name,function(zipName){
+          airHelper.writeZip(fileName + "/",TMPFILE + "/" + name,function(zipName){
             // 最后下载到本地
             res.download(zipName);
           });
