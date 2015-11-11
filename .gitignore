@@ -6,3 +6,4 @@ storage/
 .idea
 *.zip
 tmp/
+bower_components/
