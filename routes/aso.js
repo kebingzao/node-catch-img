@@ -18,7 +18,7 @@ router.post('/', function(req, res, next) {
   var pageData = {
     title: "",
     time: "",
-    th: ['名次','名字','厂商'],
+    th: ['名次','图标','名字','厂商'],
     td: []
   };
   // 获取dom
@@ -28,15 +28,16 @@ router.post('/', function(req, res, next) {
     pageData.time = $(".date-range-picker span").html();
     pageData.title = $("title").html();
     var tdArr = [];
-    $(".rank-list .thumbnail .caption").each(function(i, e) {
-      var name = $(e).find("h5").html();
+    $(".rank-list .thumbnail").each(function(i, e) {
+      var name = $(e).find(".caption h5").html();
       var num = name.split(".")[0];
       tdArr.push({
         // 这边不需要总榜
-        //num: $(e).find("h6 span").html(),
+        //num: $(e).find(".caption h6 span").html(),
         num: num,
+        icon: $(e).find("img").attr("data-original") || $(e).find("img").attr("src"),
         name: name.substr(num.length + 1),
-        company: $($(e).find("h6")[0]).html()
+        company: $($(e).find(".caption h6")[0]).html()
       })
     });
     pageData.td = tdArr;
