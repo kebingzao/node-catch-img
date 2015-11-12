@@ -16,8 +16,11 @@
   },
   "devDependencies": {
     "archiver": "^0.16.0",
+    "bufferhelper": "^0.2.0",
     "ejs": "^2.3.4",
     "express-ejs-layouts": "^2.0.0",
+    "gbk": "^0.1.0",
+    "iconv-lite": "^0.4.13",
     "node-phantom": "^0.2.5",
     "phantomjs": "^1.9.18",
     "q": "^1.4.1",

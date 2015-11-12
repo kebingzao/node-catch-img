@@ -43,13 +43,8 @@ var getDetailImg = function(url){
 };
 
 // 获取全部图片
-var getAllImg = function(data, select, fileName, url){
+var getAllImg = function(imgSrcArr, fileName, url){
   var defer = Q.defer();
-  var $ = cheerio.load(data);
-  var imgSrcArr = [];
-  $(select).each(function(i, e) {
-    imgSrcArr.push("http:" + $(e).attr("src"));
-  });
   var tatalCount = 0;
   var currentCount = 0;
   var doSuccess = function(){
@@ -116,27 +111,36 @@ var getAllImg = function(data, select, fileName, url){
 /* GET catch page. */
 // 目前只针对京东
 router.get('/catch', function(req, res, next) {
-  var name = req.query["name"];
   //var url = "http://item.jd.com/2025639.html";
   var url = req.query["url"];
-  var fileName = TMPFILE + "/" + name;
   // 首先清空tmp目录
   airHelper.clearDir(TMPFILE, function(){
-    // 接下来创建一个对应文件
-    airHelper.createDir(fileName, function(){
-      // 获取dom
-      airHelper.getPageData(url).then(function(data) {
+    // 获取dom
+    // 京东的页面是gbk编码，所以要带上gbk，不然中文会乱码
+    airHelper.getPageData(url, 'gbk').then(function(data) {
+      var $ = cheerio.load(data);
+      var imgSrcArr = [];
+      $(".spec-items li img").each(function(i, e) {
+        imgSrcArr.push("http:" + $(e).attr("src"));
+      });
+      // 这边要用text，不然中文会乱码
+      var goodName = $("#name h1").text();
+      console.log(goodName);
+      var fileName = TMPFILE + "/" + goodName;
+      // 接下来创建文件夹
+      // 接下来创建一个对应文件
+      airHelper.createDir(fileName, function(){
         // 获取数据并下载
-        getAllImg(data, ".spec-items li img", fileName, url).then(function(){
+        getAllImg(imgSrcArr, fileName, url).then(function(){
           // 接下来是保存
-          airHelper.writeZip(fileName + "/",TMPFILE + "/" + name,function(zipName){
+          airHelper.writeZip(fileName + "/",TMPFILE + "/" + goodName,function(zipName){
             // 最后下载到本地
             res.download(zipName);
           });
         });
-      },function(){
-        console.log("error");
       });
+    },function(){
+      console.log("error");
     });
   });
 });
