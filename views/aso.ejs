@@ -17,7 +17,7 @@
         <% if(data){%>
         <table id="cc" class="table table-bordered">
             <thead>
-                <th colspan="4" class="text-center"><%-data.title%></th>
+                <th colspan="4" class="data-title text-center"><%-data.title%></th>
             </thead>
             <thead>
                 <th colspan="4" class="text-center"><%-data.time%></th>
@@ -30,10 +30,16 @@
             </thead>
             <% data.td.forEach(function(item){ %>
             <tr>
-                <td><%-item.num%></td>
-                <td><img src="<%-item.icon%>"/></td>
-                <td><%-item.name%></td>
-                <td><%-item.company%></td>
+                <td rowspan="4"><%-item.num%></td>
+                <td rowspan="4"><img src="<%-item.icon%>"/></td>
+                <td rowspan="4"><%-item.name%></td>
+                <td rowspan="4"><%-item.company%></td>
+            </tr>
+            <tr>
+            </tr>
+            <tr>
+            </tr>
+            <tr>
             </tr>
             <% }) %>
         </table>
@@ -42,11 +48,12 @@
     <script>
         $(function(){
             var a = [];
+            // todo 为了让生成的 xls 表格中的图片不会挤在一起，特意把上面的表格都设置为横跨四列
             var blob = new Blob([document.getElementById("cc").outerHTML], {
                 type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
             });
 
-            saveAs(blob,  "1.xls");
+            saveAs(blob,  $(".data-title").text() + ".xls");
         })
     </script>
 </body>
