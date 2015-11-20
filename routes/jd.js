@@ -123,8 +123,8 @@ router.get('/catch', function(req, res, next) {
       $(".spec-items li img").each(function(i, e) {
         imgSrcArr.push("http:" + $(e).attr("src"));
       });
-      // 这边要用text，不然中文会乱码
-      var goodName = $("#name h1").text();
+      // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
+      var goodName = $("#name h1").text().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
       console.log(goodName);
       var fileName = TMPFILE + "/" + goodName;
       // 接下来创建文件夹
