@@ -108,39 +108,65 @@ var getAllImg = function(imgSrcArr, fileName, url){
   return defer.promise;
 };
 
+// 下载每一个url对应的图片
+var doCatchTheImg = function(url, parentFileName){
+  var defer = Q.defer();
+  // 京东的页面是gbk编码，所以要带上gbk，不然中文会乱码
+  airHelper.getPageData(url, 'gbk').then(function(data) {
+    var $ = cheerio.load(data);
+    var imgSrcArr = [];
+    $(".spec-items li img").each(function(i, e) {
+      imgSrcArr.push("http:" + $(e).attr("src"));
+    });
+    // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
+    var goodName = $("#name h1").text().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
+    console.log(goodName);
+    var fileName = parentFileName + "/" + goodName;
+    // 接下来创建文件夹
+    // 接下来创建一个对应文件
+    airHelper.createDir(fileName, function(){
+      // 获取数据并下载
+      getAllImg(imgSrcArr, fileName, url).then(function(){
+        defer.resolve();
+      });
+    });
+  },function(){
+    console.log("error");
+  });
+  return defer.promise;
+};
+
 /* GET catch page. */
 // 目前只针对京东
 router.get('/catch', function(req, res, next) {
-  //var url = "http://item.jd.com/2025639.html";
-  var url = req.query["url"];
+  // 根据换行符分行
+  var urls = req.query["url"].split("\n");
+  var total = urls.length;
+  var count = 0;
+  var parentFileName = TMPFILE + "/" + "jd";
+  var doSuccess = function(){
+    if(count === total){
+      // 接下来是保存
+      airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + "jd",function(zipName){
+        // 最后下载到本地
+        res.download(zipName);
+      });
+    }
+  };
   // 首先清空tmp目录
   airHelper.clearDir(TMPFILE, function(){
-    // 获取dom
-    // 京东的页面是gbk编码，所以要带上gbk，不然中文会乱码
-    airHelper.getPageData(url, 'gbk').then(function(data) {
-      var $ = cheerio.load(data);
-      var imgSrcArr = [];
-      $(".spec-items li img").each(function(i, e) {
-        imgSrcArr.push("http:" + $(e).attr("src"));
+    // 接下来创建文件夹
+    // 接下来创建一个对应文件
+    airHelper.createDir(parentFileName, function(){
+      // 获取dom
+      _.each(urls,function(item){
+        (function(url){
+          doCatchTheImg(url, parentFileName).then(function(){
+            count += 1;
+            doSuccess();
+          })
+        })(item.trim());
       });
-      // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
-      var goodName = $("#name h1").text().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
-      console.log(goodName);
-      var fileName = TMPFILE + "/" + goodName;
-      // 接下来创建文件夹
-      // 接下来创建一个对应文件
-      airHelper.createDir(fileName, function(){
-        // 获取数据并下载
-        getAllImg(imgSrcArr, fileName, url).then(function(){
-          // 接下来是保存
-          airHelper.writeZip(fileName + "/",TMPFILE + "/" + goodName,function(zipName){
-            // 最后下载到本地
-            res.download(zipName);
-          });
-        });
-      });
-    },function(){
-      console.log("error");
     });
   });
 });
