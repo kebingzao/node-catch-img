@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>抓网页工具</title>
+  <link rel='stylesheet' href='/stylesheets/style.css'/>
+  <link rel='stylesheet' href='/stylesheets/bootstrap.css'/>
+  <script type="application/javascript" src="/javascripts/jquery.min.js"></script>
+  <script type="application/javascript" src="/javascripts/FileSaver.js"></script>
+</head>
+<body>
+    <h1 class="text-center">针对网易一元进宝的数据抓取</h1>
+    <form method="post" class="form-horizontal" role="form" action="/duobao/yiyuan">
+        <div class="form-group">
+          <button id="getBtn" style="margin-top: 20px" class="btn btn-primary">开始抓取</button>
+        </div>
+        <% if(data){%>
+        <table id="cc" class="table table-bordered">
+            <thead>
+                <th colspan="2" class="data-title text-center"><%-data.title%></th>
+            </thead>
+            <thead>
+                <th colspan="2" class="text-center"><%=(new Date()).toLocaleString()%></th>
+            </thead>
+            <thead>
+                <th><%=data.th[0]%></th>
+                <th><%=data.th[1]%></th>
+            </thead>
+            <% data.td.forEach(function(item,index){ %>
+            <tr>
+                <td><%=index + 1%></td>
+                <td><%-item.name%></td>
+            </tr>
+            <% }) %>
+        </table>
+        <%}%>
+    </form>
+    <script>
+        $(function(){
+            var a = [];
+            var blob = new Blob([document.getElementById("cc").outerHTML], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+            });
+
+            saveAs(blob,  $(".data-title").text() + ".xls");
+        })
+    </script>
+</body>
+</html>
