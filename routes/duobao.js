@@ -26,7 +26,7 @@ router.post('/yiyuan', function(req, res, next) {
     td: []
   };
   // 最大页数
-  var maxPage = 10;
+  var maxPage = 12;
   var getPageUrl = function(index){
     return "http://1.163.com/list/0-0-1-"+ index +".html";
   };
