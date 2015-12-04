@@ -119,7 +119,7 @@ var doCatchTheImg = function(url, parentFileName){
       imgSrcArr.push("http:" + $(e).attr("src"));
     });
     // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
-    var goodName = $("#name h1").text().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
+    var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
     console.log(goodName);
     var fileName = parentFileName + "/" + goodName;
     // 接下来创建文件夹
