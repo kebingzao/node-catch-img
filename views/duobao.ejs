@@ -8,9 +8,9 @@
 <body>
     <h1 class="text-center">相关夺宝站点抓取程序</h1>
     <ul>
-        <li><a href="/duobao/catch?site=yiyuan">一元夺宝</a></li>
-        <li><a href="/duobao/catch?site=yyyg">一元云购</a></li>
-        <li><a href="/duobao/catch?site=quanmin">全民夺宝</a></li>
+        <% data.forEach(function(item){ %>
+        <li><a href="/duobao/catch?site=<%=item[0]%>"><%- item[1]%></a></li>
+        <%})%>
     </ul>
 </body>
 </html>

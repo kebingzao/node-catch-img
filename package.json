@@ -22,6 +22,8 @@
     "gbk": "^0.1.0",
     "iconv-lite": "^0.4.13",
     "livereload": "^0.4.0",
+    "moment": "^2.10.6",
+    "mongoskin": "^2.0.3",
     "node-phantom": "^0.2.5",
     "phantomjs": "^1.9.18",
     "q": "^1.4.1",

@@ -3,13 +3,22 @@ var router = express.Router();
 var cheerio = require("cheerio");
 var fs = require("fs");
 var Q = require("q");
+var moment = require("moment");
 var _ = require("underscore");
+// 要抓取的站点列表
+var SITE_LIST = {
+  "yiyuan": "一元夺宝",
+  "quanmin": "全民夺宝",
+  "yyyg": "一元云购"
+};
+
 var airHelper = require('../lib/helper');
+var dbSiteHelper = require('../lib/dbSiteHelper');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('duobao', {
-
+    data: _.pairs(SITE_LIST)
   });
 });
 // 抓取网易的一元夺宝
@@ -158,11 +167,54 @@ router.post('/catch', function(req, res, next) {
   var pageData = {
     title: site,
     site: site,
+    time: moment().format("YYYY-MM-DD"),
     data: ''
+  };
+  // 插入数据库
+  var insertSiteData = function(){
+    dbSiteHelper.getCollectionItem(site,{time: pageData.time}).then(function(){
+      // 如果已经存在，那么直接覆盖
+      console.log("已经存在，直接覆盖");
+      dbSiteHelper.getCollection(site).update({
+        "time": pageData.time
+      }, {'$set':{
+        "data": pageData.data
+      }}, function (err, list) {
+        if (err){
+          console.log("err: " + err);
+          throw err;
+        }
+        res.render('duobao/catch', pageData);
+      });
+    },function(){
+      console.log("不存在，插入");
+      dbSiteHelper.getCollection(site).insert({
+        "name": site,
+        "time": pageData.time,
+        "data": pageData.data
+      }, function (err, list) {
+        if (err){
+          console.log("err: " + err);
+          throw err;
+        }
+        res.render('duobao/catch', pageData);
+      });
+    });
   };
   var doFinish = function(data){
     pageData.data = data;
-    res.render('duobao/catch', pageData);
+    // 接下来入库
+    dbSiteHelper.checkSiteExist(site).then(function(){
+      // 已存在
+      insertSiteData();
+    },function(){
+      dbSiteHelper.dbSiteList.insert({
+        key: site,
+        name: SITE_LIST[site]
+      },function(){
+        insertSiteData();
+      });
+    });
   };
   switch(site){
     case "yiyuan":
@@ -179,4 +231,7 @@ router.post('/catch', function(req, res, next) {
       break;
   }
 });
+
+
+
 module.exports = router;
