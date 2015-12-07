@@ -235,7 +235,7 @@ router.post('/catch', function(req, res, next) {
 
 // 查看往期数据
 router.get('/past', function(req, res) {
-  var site = req.query["site"];
+  var site = req.query["site"] || "yiyuan";
   var doFinish = function(list){
     res.render('duobao/past', {
       title: SITE_LIST[site],
