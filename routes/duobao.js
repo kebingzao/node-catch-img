@@ -45,7 +45,7 @@ var catchYiYuan = function(){
         var tdArr = [];
         $(".w-quickBuyList-item .w-goods-title a").each(function(i, e) {
           tdArr.push({
-            name: $(e).html()
+            name: $(e).text()
           })
         });
         pageData.td = pageData.td.concat(tdArr);
