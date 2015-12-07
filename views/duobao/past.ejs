@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>抓网页工具</title>
+  <link rel='stylesheet' href='/stylesheets/style.css'/>
+  <link rel='stylesheet' href='/stylesheets/bootstrap.css'/>
+    <script>
+        document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+        ':35729/livereload.js?snipver=1"></' + 'script>')
+    </script>
+  <script type="application/javascript" src="/javascripts/jquery.min.js"></script>
+  <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <h1 class="text-center"><%-title%></h1>
+    <div>
+        <div class="row">
+        <!-- Nav tabs -->
+        <ul class="nav nav-pills nav-stacked col-md-2" role="tablist">
+            <% list.forEach(function(listItem,index){ %>
+            <li role="presentation" <%if(index === 0){%>class="active"<%}%>>
+                <a href="#<%=listItem.time%>" aria-controls="<%=listItem.time%>" role="tab" data-toggle="tab">
+                    <%=listItem.time%>
+                </a>
+            </li>
+            <%})%>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content col-md-10">
+            <% list.forEach(function(listItem,index){ %>
+            <div role="tabpanel" class="tab-pane <%if(index===0){%>active<%}%>" id="<%=listItem.time%>">
+                <% if( listItem.data.td.length === 0) { %>
+                <span>该日期没有数据</span>
+                <% }else { %>
+                <table id="cc" class="table table-bordered">
+                    <thead>
+                    <th colspan="2" class="data-title text-center"><%-listItem.data.title%></th>
+                    </thead>
+                    <thead>
+                    <th colspan="2" class="data-time text-center"><%=listItem.time%></th>
+                    </thead>
+                    <thead>
+                    <th><%=listItem.data.th[0]%></th>
+                    <th><%=listItem.data.th[1]%></th>
+                    </thead>
+                    <% listItem.data.td.forEach(function(item,index){ %>
+                    <tr>
+                        <td><%=index + 1%></td>
+                        <td><%-item.name%></td>
+                    </tr>
+                    <% }) %>
+                </table>
+                <% } %>
+            </div>
+            <%})%>
+        </div>
+
+    </div>
+</body>
+</html>
