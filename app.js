@@ -62,4 +62,8 @@ app.use(function(err, req, res, next) {
 });
 
 
+livereload = require('livereload');
+server = livereload.createServer();
+server.watch(__dirname + "/public");
+
 module.exports = app;
