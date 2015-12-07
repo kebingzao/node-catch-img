@@ -51,6 +51,48 @@ var catchYiYuan = function(){
   return defer.promise;
 };
 
+// 抓取一元云购的页面
+var catchYYYG = function(){
+  var defer = Q.defer();
+  var pageData = {
+    title: "一元云购",
+    th: ['编号','名称'],
+    td: []
+  };
+  // 最大页数
+  var maxPage = 5;
+  var getPageUrl = function(index){
+    return "http://www.yyyg.com/goods_list/index.html?p=" + index;
+  };
+  var count = 1;
+  var doCatch = function(){
+    if(count > maxPage){
+      defer.resolve(pageData);
+    }else{
+      airHelper.getPageData(getPageUrl(count)).then(function(data) {
+        // 获取数据并下载
+        var $ = cheerio.load(data);
+        var tdArr = [];
+        $("#ulGoodsList .w-goods-title a").each(function(i, e) {
+          tdArr.push({
+            name: $(e).text().replace(/([一十1]元云购)(.*)/,"$2")
+          })
+        });
+        // 获取尾页
+        var pageEndUrl = $("#Page_End a").attr("href");
+        pageEndUrl && (maxPage = pageEndUrl.replace(/(.*)(\?p=)(.*)/, "$3").trim());
+        pageData.td = pageData.td.concat(tdArr);
+        count += 1;
+        doCatch();
+      },function(){
+        console.log("error");
+      });
+    }
+  };
+  doCatch();
+  return defer.promise;
+};
+
 // 抓取全民夺宝的页面
 var catchQuanmin = function(){
   var defer = Q.defer();
@@ -118,23 +160,22 @@ router.post('/catch', function(req, res, next) {
     site: site,
     data: ''
   };
+  var doFinish = function(data){
+    pageData.data = data;
+    res.render('duobao/catch', pageData);
+  };
   switch(site){
     case "yiyuan":
       pageData.title = "针对网易一元夺宝的商品页面抓取";
-      catchYiYuan().then(function(data){
-        pageData.data = data;
-        res.render('duobao/catch', pageData);
-      });
+      catchYiYuan().then(doFinish);
       break;
     case "quanmin":
       pageData.title = "针对全民夺宝的商品页面抓取";
-      catchQuanmin().then(function(data){
-        pageData.data = data;
-        res.render('duobao/catch', pageData);
-      });
+      catchQuanmin().then(doFinish);
       break;
     case "yyyg":
       pageData.title = "针对一元云购的商品页面抓取";
+      catchYYYG().then(doFinish);
       break;
   }
 });
