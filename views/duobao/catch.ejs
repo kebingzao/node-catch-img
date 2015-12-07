@@ -12,8 +12,8 @@
   <script type="application/javascript" src="/javascripts/FileSaver.js"></script>
 </head>
 <body>
-    <h1 class="text-center">针对全民夺宝的数据抓取</h1>
-    <form method="post" class="form-horizontal" role="form" action="/duobao/quanmin">
+    <h1 class="text-center"><%-title%></h1>
+    <form method="post" class="form-horizontal" role="form" action="/duobao/catch?site=<%=site%>">
         <div class="form-group">
           <button id="getBtn" style="margin-top: 20px" class="btn btn-primary">开始抓取</button>
         </div>

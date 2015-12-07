@@ -12,14 +12,9 @@ router.get('/', function(req, res, next) {
 
   });
 });
-// 网易的一元夺宝的数据
-router.get('/yiyuan', function(req, res, next) {
-  res.render('duobao/yiyuan', {
-    data: ''
-  });
-});
-
-router.post('/yiyuan', function(req, res, next) {
+// 抓取网易的一元夺宝
+var catchYiYuan = function(){
+  var defer = Q.defer();
   var pageData = {
     title: "网易一元夺宝",
     th: ['编号','名称'],
@@ -33,9 +28,7 @@ router.post('/yiyuan', function(req, res, next) {
   var count = 1;
   var doCatch = function(){
     if(count > maxPage){
-      res.render('duobao/yiyuan', {
-        data: pageData
-      });
+      defer.resolve(pageData)
     }else{
       airHelper.getPageData(getPageUrl(count)).then(function(data) {
         // 获取数据并下载
@@ -55,17 +48,12 @@ router.post('/yiyuan', function(req, res, next) {
     }
   };
   doCatch();
-});
+  return defer.promise;
+};
 
-
-// 全民夺宝的数据
-router.get('/quanmin', function(req, res, next) {
-  res.render('duobao/quanmin', {
-    data: ''
-  });
-});
-
-router.post('/quanmin', function(req, res, next) {
+// 抓取全民夺宝的页面
+var catchQuanmin = function(){
+  var defer = Q.defer();
   var pageData = {
     title: "全民夺宝",
     th: ['编号','名称'],
@@ -79,9 +67,7 @@ router.post('/quanmin', function(req, res, next) {
   var count = 1;
   var doCatch = function(){
     if(count > maxPage){
-      res.render('duobao/quanmin', {
-        data: pageData
-      });
+      defer.resolve(pageData);
     }else{
       airHelper.getPageData(getPageUrl(count)).then(function(data) {
         // 获取数据并下载
@@ -101,5 +87,55 @@ router.post('/quanmin', function(req, res, next) {
     }
   };
   doCatch();
+  return defer.promise;
+};
+
+router.get('/catch', function(req, res) {
+  var site = req.query["site"];
+  var pageData = {
+    title: site,
+    site: site,
+    data: ''
+  };
+  switch(site){
+    case "yiyuan":
+      pageData.title = "针对网易一元夺宝的商品页面抓取";
+      break;
+    case "quanmin":
+      pageData.title = "针对全民夺宝的商品页面抓取";
+      break;
+    case "yyyg":
+      pageData.title = "针对一元云购的商品页面抓取";
+      break;
+  }
+  res.render('duobao/catch', pageData);
+});
+
+router.post('/catch', function(req, res, next) {
+  var site = req.query["site"];
+  var pageData = {
+    title: site,
+    site: site,
+    data: ''
+  };
+  switch(site){
+    case "yiyuan":
+      pageData.title = "针对网易一元夺宝的商品页面抓取";
+      catchYiYuan().then(function(data){
+        pageData.data = data;
+        res.render('duobao/catch', pageData);
+      });
+      break;
+    case "quanmin":
+      pageData.title = "针对全民夺宝的商品页面抓取";
+      catchQuanmin().then(function(data){
+        pageData.data = data;
+        res.render('duobao/catch', pageData);
+      });
+      break;
+    case "yyyg":
+      pageData.title = "针对一元云购的商品页面抓取";
+      break;
+  }
 });
 module.exports = router;
