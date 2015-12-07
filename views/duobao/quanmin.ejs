@@ -34,15 +34,6 @@
         </table>
         <%}%>
     </form>
-    <script>
-        $(function(){
-            var a = [];
-            var blob = new Blob([document.getElementById("cc").outerHTML], {
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
-            });
-
-            saveAs(blob,  $(".data-title").text() + "_" +$(".data-time").text() + ".xls");
-        })
-    </script>
+    <script type="application/javascript" src="/javascripts/util/saverExcel.js"></script>
 </body>
 </html>

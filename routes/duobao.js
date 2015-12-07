@@ -26,7 +26,7 @@ router.post('/yiyuan', function(req, res, next) {
     td: []
   };
   // 最大页数
-  var maxPage = 12;
+  var maxPage = 15;
   var getPageUrl = function(index){
     return "http://1.163.com/list/0-0-1-"+ index +".html";
   };
@@ -72,7 +72,7 @@ router.post('/quanmin', function(req, res, next) {
     td: []
   };
   // 最大页数
-  var maxPage = 8;
+  var maxPage = 15;
   var getPageUrl = function(index){
     return "http://www.qmduobao.com/list/hot20/p_"+ index +".html";
   };
