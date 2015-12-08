@@ -9,7 +9,8 @@ var _ = require("underscore");
 var SITE_LIST = {
   "yiyuan": "一元夺宝",
   "quanmin": "全民夺宝",
-  "yyyg": "一元云购"
+  "yyyg": "一元云购",
+  "xunlei": "迅雷一元夺宝"
 };
 
 var airHelper = require('../lib/helper');
@@ -141,31 +142,48 @@ var catchQuanmin = function(){
   return defer.promise;
 };
 
+// 抓取迅雷一元夺宝的页面
+var catchXunlei = function(){
+  var defer = Q.defer();
+  var pageData = {
+    title: "迅雷一元夺宝",
+    th: ['编号','名称'],
+    td: []
+  };
+  var getPageUrl = function(index){
+    return "http://1.vip.xunlei.com/";
+  };
+  airHelper.getPageData(getPageUrl()).then(function(data) {
+    // 获取数据并下载
+    var $ = cheerio.load(data);
+    var tdArr = [];
+    $(".cont_box .prize_img").each(function(i, e) {
+      tdArr.push({
+        name: $(e).attr("title")
+      })
+    });
+    pageData.td = pageData.td.concat(tdArr);
+    defer.resolve(pageData);
+  },function(){
+    console.log("error");
+  });
+  return defer.promise;
+};
+
 router.get('/catch', function(req, res) {
   var site = req.query["site"];
   var pageData = {
-    title: site,
+    title: SITE_LIST[site],
     site: site,
     data: ''
   };
-  switch(site){
-    case "yiyuan":
-      pageData.title = "针对网易一元夺宝的商品页面抓取";
-      break;
-    case "quanmin":
-      pageData.title = "针对全民夺宝的商品页面抓取";
-      break;
-    case "yyyg":
-      pageData.title = "针对一元云购的商品页面抓取";
-      break;
-  }
   res.render('duobao/catch', pageData);
 });
 
 router.post('/catch', function(req, res, next) {
   var site = req.query["site"];
   var pageData = {
-    title: site,
+    title: SITE_LIST[site],
     site: site,
     time: moment().format("YYYY-MM-DD"),
     data: ''
@@ -218,16 +236,16 @@ router.post('/catch', function(req, res, next) {
   };
   switch(site){
     case "yiyuan":
-      pageData.title = "针对网易一元夺宝的商品页面抓取";
       catchYiYuan().then(doFinish);
       break;
     case "quanmin":
-      pageData.title = "针对全民夺宝的商品页面抓取";
       catchQuanmin().then(doFinish);
       break;
     case "yyyg":
-      pageData.title = "针对一元云购的商品页面抓取";
       catchYYYG().then(doFinish);
+      break;
+    case "xunlei":
+      catchXunlei().then(doFinish);
       break;
   }
 });
