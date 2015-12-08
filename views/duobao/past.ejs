@@ -10,13 +10,21 @@
     </script>
   <script type="application/javascript" src="/javascripts/jquery.min.js"></script>
   <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+  <script type="application/javascript" src="/javascripts/FileSaver.js"></script>
 
 </head>
 <body>
     <h1 class="text-center"><%-title%></h1>
-    <% if(list.length > 1){ %>
-    <a class="btn btn-primary" style="margin-bottom: 10px;" href="/duobao/compare?time1=<%=list[0].time%>&time2=<%=list[1].time%>&site=<%=site%>">对比最近两天的数据</a>
-    <% } %>
+    <div class="row" style="margin-bottom: 10px">
+        <div class="col-md-2">
+            <% if(list.length > 1){ %>
+            <a class="btn btn-primary" href="/duobao/compare?time1=<%=list[0].time%>&time2=<%=list[1].time%>&site=<%=site%>">对比最近两天的数据</a>
+            <% } %>
+        </div>
+        <div class="col-md-2">
+            <button id="importExcel" class="btn btn-primary">导出对应天的Excel</button>
+        </div>
+    </div>
     <div>
         <div class="row">
         <!-- Nav tabs -->
@@ -37,7 +45,7 @@
                 <% if( listItem.data.td.length === 0) { %>
                 <span>该日期没有数据</span>
                 <% }else { %>
-                <table id="cc" class="table table-bordered">
+                <table class="table table-bordered">
                     <thead>
                     <th colspan="2" class="data-title text-center"><%-listItem.data.title%></th>
                     </thead>
@@ -61,5 +69,17 @@
         </div>
 
     </div>
+        <script>
+            $(function() {
+                $("#importExcel").click(function(){
+                    var activeTable = $(".tab-content .active");
+                    var blob = new Blob([activeTable.find("table").get(0).outerHTML], {
+                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+                    });
+
+                    saveAs(blob,  activeTable.find(".data-title").text() + "_" +activeTable.find(".data-time").text() + ".xls");
+                })
+            });
+        </script>
 </body>
 </html>
