@@ -16,14 +16,11 @@
 <body>
     <h1 class="text-center"><%-title%></h1>
     <div class="row" style="margin-bottom: 10px">
-        <div class="col-md-2">
-            <% if(list.length > 1){ %>
-            <a class="btn btn-primary" href="/duobao/compare?time1=<%=list[0].time%>&time2=<%=list[1].time%>&site=<%=site%>">对比最近两天的数据</a>
-            <% } %>
-        </div>
-        <div class="col-md-2">
-            <button id="importExcel" class="btn btn-primary">导出对应天的Excel</button>
-        </div>
+        <a class="btn btn-primary" href="/duobao">回首页</a>
+        <% if(list.length > 1){ %>
+        <a class="btn btn-primary" href="/duobao/compare?time1=<%=list[0].time%>&time2=<%=list[1].time%>&site=<%=site%>">对比最近两天的数据</a>
+        <% } %>
+        <button id="importExcel" class="btn btn-primary">导出对应天的Excel</button>
     </div>
     <div>
         <div class="row">
