@@ -242,7 +242,7 @@ router.get('/past', function(req, res) {
       list: list || []
     });
   };
-  dbSiteHelper.getCollectionAllItem(site).then(doFinish,doFinish);
+  dbSiteHelper.getCollectionAllItem(site,{},{time: -1}).then(doFinish,doFinish);
 });
 
 module.exports = router;
