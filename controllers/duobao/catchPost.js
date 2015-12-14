@@ -17,18 +17,5 @@ module.exports = function (req, res, next) {
       res.render('duobao/catch', pageData);
     });
   };
-  switch(site){
-    case "yiyuan":
-      siteCatch.yiyuan().then(doFinish);
-      break;
-    case "quanmin":
-      siteCatch.quanmin().then(doFinish);
-      break;
-    case "yyyg":
-      siteCatch.yyyg().then(doFinish);
-      break;
-    case "xunlei":
-      siteCatch.xunlei().then(doFinish);
-      break;
-  }
+  siteCatch[site]().then(doFinish);
 };
