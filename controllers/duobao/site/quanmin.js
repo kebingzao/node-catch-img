@@ -1,4 +1,5 @@
 var Q = require("q");
+var _ = require("underscore");
 var airHelper = require('../../../lib/helper');
 // 抓取全民夺宝数据
 module.exports = function(){
