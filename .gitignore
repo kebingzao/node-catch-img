@@ -7,3 +7,4 @@ storage/
 *.zip
 tmp/
 bower_components/
+backup/
