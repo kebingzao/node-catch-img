@@ -11,8 +11,8 @@ var binPath = phantomjs.path;
 
 var TMPFILE = 'tmp';
 
-// Í¨¹ı phantom.js »ñÈ¡Ò³ÃæÖĞÓÃjs¼ÓÔØµÄ¶«Î÷
-// todo ¾©¶«µÄÏêÇéÍ¼Æ¬ÊÇ²»°üº¬ÔÚÒ³ÃæµÄÔ´´úÂëÀïÃæµÄ£¬¶øÊÇÍ¨¹ıÒ³ÃæµÄjs¼ÓÔØ³öÀ´µÄ£¬Òò´ËÒªÓÃphantom.jsµÈÒ³Ãæ¼ÓÔØÍêÖ®ºó£¬ÔÙ´ÓdomÀïÃæÈ¡
+// é€šè¿‡ phantom.js è·å–é¡µé¢ä¸­ç”¨jsåŠ è½½çš„ä¸œè¥¿
+// todo äº¬ä¸œçš„è¯¦æƒ…å›¾ç‰‡æ˜¯ä¸åŒ…å«åœ¨é¡µé¢çš„æºä»£ç é‡Œé¢çš„ï¼Œè€Œæ˜¯é€šè¿‡é¡µé¢çš„jsåŠ è½½å‡ºæ¥çš„ï¼Œå› æ­¤è¦ç”¨phantom.jsç­‰é¡µé¢åŠ è½½å®Œä¹‹åï¼Œå†ä»domé‡Œé¢å–
 var getDetailImg = function(url){
   var defer = Q.defer();
   var childArgs = [
@@ -26,7 +26,7 @@ var getDetailImg = function(url){
     try{
       target = JSON.parse(target);
       if(target.code == 1){
-        // ·µ»ØÏêÇéÍ¼Æ¬Êı×é
+        // è¿”å›è¯¦æƒ…å›¾ç‰‡æ•°ç»„
         defer.resolve(target.msg);
       }
     }catch(e){
@@ -36,7 +36,7 @@ var getDetailImg = function(url){
   return defer.promise;
 };
 
-// »ñÈ¡È«²¿Í¼Æ¬
+// è·å–å…¨éƒ¨å›¾ç‰‡
 var getAllImg = function(imgSrcArr, fileName, url){
   var defer = Q.defer();
   var tatalCount = 0;
@@ -48,10 +48,10 @@ var getAllImg = function(imgSrcArr, fileName, url){
     }
   };
 
-  //todo ×¢Òâ£¬Õâ±ßÖ»Õë¶Ô¾©¶«½øĞĞ´¦Àí
+  //todo æ³¨æ„ï¼Œè¿™è¾¹åªé’ˆå¯¹äº¬ä¸œè¿›è¡Œå¤„ç†
   // todo http://img14.360buyimg.com/n5/jfs/t2053/317/924464287/25158/b0e589f2/5631d1a9N4668d62a.jpg
-  // Ö»Òª°ÑÁ´½ÓÖĞµÄn5£¬¸Ä³Én4£¬n3£¬n2£¬n1£¬¾Í¿ÉÒÔÏÂÔØ¶ÔÓ¦µÄÍ¼Æ¬
-  // Ä¿Ç°Ö»×¥n1£¬²¢°Ñn1¸Ä³É intro_big_pics
+  // åªè¦æŠŠé“¾æ¥ä¸­çš„n5ï¼Œæ”¹æˆn4ï¼Œn3ï¼Œn2ï¼Œn1ï¼Œå°±å¯ä»¥ä¸‹è½½å¯¹åº”çš„å›¾ç‰‡
+  // ç›®å‰åªæŠ“n1ï¼Œå¹¶æŠŠn1æ”¹æˆ intro_big_pics
   //var allImgSrcArr = {
   //  'n5': imgSrcArr,
   //  'n4': _.map(imgSrcArr,function(item){
@@ -72,19 +72,19 @@ var getAllImg = function(imgSrcArr, fileName, url){
       return item.replace("/n5/", '/n1/');
     })
   };
-  // ¿ªÊ¼Ò»ÕÅÕÅ¼ÓÔØ
+  // å¼€å§‹ä¸€å¼ å¼ åŠ è½½
   var doLoad = function(){
-    // ÕâÊ±ºò×ÜÊıÓĞ±ä
+    // è¿™æ—¶å€™æ€»æ•°æœ‰å˜
     _.each(allImgSrcArr,function(item){
       tatalCount += item.length;
     });
-    // ½ÓÏÂÀ´¾ÍÑ­»·Ò»ÕÅÒ»ÕÅÏÂÔØ
+    // æ¥ä¸‹æ¥å°±å¾ªç¯ä¸€å¼ ä¸€å¼ ä¸‹è½½
     _.each(allImgSrcArr, function(itemArr, key){
-      // ÕâÊ±ºòÒªÏÈ½¨¶ÔÓ¦µÄÎÄ¼ş¼Ğ
+      // è¿™æ—¶å€™è¦å…ˆå»ºå¯¹åº”çš„æ–‡ä»¶å¤¹
       (function(itemArr, key){
         var detailFileName = fileName + "/" + key;
         airHelper.createDir(detailFileName, function(){
-          // ½ÓÏÂÀ´Ò»ÕÅÕÅÏÂÔØ
+          // æ¥ä¸‹æ¥ä¸€å¼ å¼ ä¸‹è½½
           _.each(itemArr, function(item,index){
             (function(item, index){
               airHelper.catchAndSaveImg(item, detailFileName + "/" + index).then(doSuccess, doSuccess);
@@ -94,7 +94,7 @@ var getAllImg = function(imgSrcArr, fileName, url){
       })(itemArr,key);
     });
   };
-  // ½ÓÏÂÀ´¾Í»ñÈ¡ÏêÇéÍ¼Æ¬ÁË
+  // æ¥ä¸‹æ¥å°±è·å–è¯¦æƒ…å›¾ç‰‡äº†
   getDetailImg(url).then(function(arr){
     allImgSrcArr["descr"] = arr;
     doLoad();
@@ -102,24 +102,24 @@ var getAllImg = function(imgSrcArr, fileName, url){
   return defer.promise;
 };
 
-// ÏÂÔØÃ¿Ò»¸öurl¶ÔÓ¦µÄÍ¼Æ¬
+// ä¸‹è½½æ¯ä¸€ä¸ªurlå¯¹åº”çš„å›¾ç‰‡
 var doCatchTheImg = function(url, parentFileName){
   var defer = Q.defer();
-  // ¾©¶«µÄÒ³ÃæÊÇgbk±àÂë£¬ËùÒÔÒª´øÉÏgbk£¬²»È»ÖĞÎÄ»áÂÒÂë
+  // äº¬ä¸œçš„é¡µé¢æ˜¯gbkç¼–ç ï¼Œæ‰€ä»¥è¦å¸¦ä¸Šgbkï¼Œä¸ç„¶ä¸­æ–‡ä¼šä¹±ç 
   airHelper.getPageData(url, 'gbk').then(function(data) {
     var $ = cheerio.load(data);
     var imgSrcArr = [];
     $(".spec-items li img").each(function(i, e) {
       imgSrcArr.push("http:" + $(e).attr("src"));
     });
-    // Õâ±ßÒªÓÃtext£¬²»È»ÖĞÎÄ»áÂÒÂë, Í¬Ê±»¹Òª¹ıÂËµôÒ»Ğ©Ãô¸Ğ×Ö·û
+    // è¿™è¾¹è¦ç”¨textï¼Œä¸ç„¶ä¸­æ–‡ä¼šä¹±ç , åŒæ—¶è¿˜è¦è¿‡æ»¤æ‰ä¸€äº›æ•æ„Ÿå­—ç¬¦
     var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
     console.log(goodName);
     var fileName = parentFileName + "/" + goodName;
-    // ½ÓÏÂÀ´´´½¨ÎÄ¼ş¼Ğ
-    // ½ÓÏÂÀ´´´½¨Ò»¸ö¶ÔÓ¦ÎÄ¼ş
+    // æ¥ä¸‹æ¥åˆ›å»ºæ–‡ä»¶å¤¹
+    // æ¥ä¸‹æ¥åˆ›å»ºä¸€ä¸ªå¯¹åº”æ–‡ä»¶
     airHelper.createDir(fileName, function(){
-      // »ñÈ¡Êı¾İ²¢ÏÂÔØ
+      // è·å–æ•°æ®å¹¶ä¸‹è½½
       getAllImg(imgSrcArr, fileName, url).then(function(){
         defer.resolve();
       });
@@ -132,26 +132,26 @@ var doCatchTheImg = function(url, parentFileName){
 
 // router js/catch
 module.exports = function (req, res, next) {
-  // ¸ù¾İ»»ĞĞ·û·ÖĞĞ
+  // æ ¹æ®æ¢è¡Œç¬¦åˆ†è¡Œ
   var urls = req.query["url"].split("\n");
   var total = urls.length;
   var count = 0;
   var parentFileName = TMPFILE + "/" + "jd";
   var doSuccess = function(){
     if(count === total){
-      // ½ÓÏÂÀ´ÊÇ±£´æ
+      // æ¥ä¸‹æ¥æ˜¯ä¿å­˜
       airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + "jd",function(zipName){
-        // ×îºóÏÂÔØµ½±¾µØ
+        // æœ€åä¸‹è½½åˆ°æœ¬åœ°
         res.download(zipName);
       });
     }
   };
-  // Ê×ÏÈÇå¿ÕtmpÄ¿Â¼
+  // é¦–å…ˆæ¸…ç©ºtmpç›®å½•
   airHelper.clearDir(TMPFILE, function(){
-    // ½ÓÏÂÀ´´´½¨ÎÄ¼ş¼Ğ
-    // ½ÓÏÂÀ´´´½¨Ò»¸ö¶ÔÓ¦ÎÄ¼ş
+    // æ¥ä¸‹æ¥åˆ›å»ºæ–‡ä»¶å¤¹
+    // æ¥ä¸‹æ¥åˆ›å»ºä¸€ä¸ªå¯¹åº”æ–‡ä»¶
     airHelper.createDir(parentFileName, function(){
-      // »ñÈ¡dom
+      // è·å–dom
       _.each(urls,function(item){
         (function(url){
           doCatchTheImg(url, parentFileName).then(function(){
