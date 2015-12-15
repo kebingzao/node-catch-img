@@ -4,10 +4,12 @@ var gulp = require('gulp'),
     _ = require("underscore"),
     seq = require("gulp-sequence"),
     replace = require("gulp-replace"),
+    zip = require('gulp-zip'),
     gutil = require("gulp-util");
 
 var BUILD_DIR = path.join(__dirname, 'build');
 var WORKSPACE_DIR = path.join(__dirname, './');
+var BUILD_TIME = gutil.date('yymmddHHMM');
 var noCopyDir = [".git", ".idea", "backup", "bower_components", "build", "node_modules"];
 var noCopyFile = ["*.zip"];
 // Clean
@@ -45,7 +47,14 @@ gulp.task('removeCode_view', function() {
         pipe(replace(/<!-- REMOVE START -->[\s\S]+?<!-- REMOVE END -->/gi, "")).
         pipe(gulp.dest(path.join(BUILD_DIR, 'views')));
 });
+// 打 zip 包
+gulp.task('zip', function () {
+    var zipName = "catch_util" + '_' + BUILD_TIME + '.zip';
+    return gulp.src(BUILD_DIR + '/**')
+        .pipe(zip(zipName))
+        .pipe(gulp.dest('.'));
+});
 
 gulp.task('removeCode', seq('removeCode_app', 'removeCode_view'));
 
-gulp.task('default', seq('clean', 'copy', 'removeCode'));
+gulp.task('default', seq('clean', 'copy', 'removeCode', 'zip'));
