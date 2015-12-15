@@ -59,9 +59,9 @@ app.use(function(err, req, res, next) {
   });
 });
 
-
+<!-- REMOVE START -->
 livereload = require('livereload');
 server = livereload.createServer();
 server.watch(__dirname + "/public");
-
+<!-- REMOVE END -->
 module.exports = app;

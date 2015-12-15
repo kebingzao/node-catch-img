@@ -8,3 +8,4 @@ storage/
 tmp/
 bower_components/
 backup/
+build/
