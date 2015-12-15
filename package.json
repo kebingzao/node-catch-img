@@ -27,6 +27,7 @@
     "gulp-replace": "^0.5.4",
     "gulp-sequence": "^0.4.1",
     "gulp-util": "^3.0.7",
+    "gulp-zip": "^3.0.2",
     "iconv-lite": "^0.4.13",
     "livereload": "^0.4.0",
     "moment": "^2.10.6",
