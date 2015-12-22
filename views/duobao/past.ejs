@@ -126,6 +126,7 @@
                 $(".checkbox").each(function(index){
                     $(this).get(0).checked = false;
                 });
+                $($(".presentLi")[0]).addClass("active");
                 $(".checkbox").each(function(index){
                     if(index < 2){
                         $(this).trigger("click");
