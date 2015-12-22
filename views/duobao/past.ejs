@@ -20,19 +20,21 @@
     <div class="row" style="margin-bottom: 10px">
         <a class="btn btn-primary" href="/duobao">回首页</a>
         <% if(list.length > 1){ %>
-        <a class="btn btn-primary" href="/duobao/compare?time1=<%=list[0].time%>&time2=<%=list[1].time%>&site=<%=site%>">对比最近两天的数据</a>
+        <a id="compareBtn" class="btn btn-primary" data-site="<%=site%>">对比所选天数的数据</a>
         <% } %>
         <button id="importExcel" class="btn btn-primary">导出对应天的Excel</button>
     </div>
     <div>
         <div class="row">
         <!-- Nav tabs -->
+
         <ul class="nav nav-pills nav-stacked col-md-2" role="tablist">
             <% list.forEach(function(listItem,index){ %>
-            <li role="presentation" <%if(index === 0){%>class="active"<%}%>>
+            <li class="presentLi" role="presentation" <%if(index === 0){%>class="active"<%}%>>
                 <a href="#<%=listItem.time%>" aria-controls="<%=listItem.time%>" role="tab" data-toggle="tab">
                     <%=listItem.time%>
                 </a>
+                <input class="checkbox" type="checkbox" value="<%=listItem.time%>">
             </li>
             <%})%>
         </ul>
@@ -69,15 +71,66 @@
 
     </div>
         <script>
-            $(function() {
-                $("#importExcel").click(function(){
-                    var activeTable = $(".tab-content .active");
-                    var blob = new Blob([activeTable.find("table").get(0).outerHTML], {
-                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
-                    });
 
-                    saveAs(blob,  activeTable.find(".data-title").text() + "_" +activeTable.find(".data-time").text() + ".xls");
-                })
+            window.Array.prototype.remove = function (val) {
+                var index = this.indexOf(val);
+                if (index > -1) {
+                    this.splice(index, 1);
+                }
+            };
+
+            $(function() {
+//                $("#importExcel").click(function(){
+//                    var activeTable = $(".tab-content .active");
+//                    var blob = new Blob([activeTable.find("table").get(0).outerHTML], {
+//                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+//                    });
+//
+//                    saveAs(blob,  activeTable.find(".data-title").text() + "_" +activeTable.find(".data-time").text() + ".xls");
+//                })
+                var checkBoxArr = [];
+                $(".checkbox").click(function(e){
+                    var target = $(e.currentTarget);
+                    var value = target.get(0).value;
+                    if(target.attr("checked") == "checked" || target.get(0).checked){
+                        checkBoxArr.push(value);
+                    }else{
+                        // 去掉选项
+                        checkBoxArr.remove(value);
+                    }
+                    if(checkBoxArr.length > 1){
+                        // 除了已经选的，其他都置灰
+                        $(".checkbox").each(function(){
+                            if(!($(this).attr("checked") == "checked" || $(this).get(0).checked)){
+                                $(this).attr("disabled",true);
+                                $(this).addClass("disabled");
+                            }
+                        });
+                        // 比较按钮可以用
+                        var newArr = checkBoxArr.sort(function(a,b){return a<b});
+                        var compareUrl = "/duobao/compare?time1="+ newArr[0] +"&time2="+ newArr[1] +"&site="+ $("#compareBtn").attr("data-site");
+                        $("#compareBtn").attr("href", compareUrl);
+                        $("#compareBtn").removeAttr("disabled");
+                    }else{
+                        $(".checkbox").removeAttr("disabled");
+                        $(".checkbox").removeClass("disabled");
+                        $("#compareBtn").attr("disabled", true);
+                    }
+                });
+                $("#compareBtn").click(function(e){
+                    if($(e.currentTarget).attr("disabled")){
+                        return false;
+                    }
+                });
+                // 默认勾选前两个
+                $(".checkbox").each(function(index){
+                    $(this).get(0).checked = false;
+                });
+                $(".checkbox").each(function(index){
+                    if(index < 2){
+                        $(this).trigger("click");
+                    }
+                });
             });
         </script>
 </body>

@@ -6,3 +6,13 @@ body {
 a {
   color: #00B7FF;
 }
+
+.presentLi .checkbox {
+  position: absolute;
+  left: 8px;
+  top: 10px;
+}
+
+.presentLi a {
+  text-indent: 10px;
+}
