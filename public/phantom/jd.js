@@ -1,4 +1,4 @@
-// phantom.js ÀïÃæµÄÖ´ĞĞÎÄ¼ş
+// phantom.js ç”¨äºæŠ“å–äº¬ä¸œè¯¦ç»†é¡µ
 
 var page = require('webpage').create();
 var url = "";
@@ -13,18 +13,20 @@ if (phantom.args.length === 0) {
 }
 console.log(url);
 page.open(url, function(status) {
-  // ¼ÓÔØjquery
+  // åŠ è½½ jquery
   page.includeJs( '/public/javascripts/jquery.min.js', function() {
-    // »ñÈ¡ÏêÇéÍ¼
+    // å¤„ç†æ•°æ®
     var imgMsg = page.evaluate(function() {
       //return document.title;
       var imgArr = [];
       $("#J-detail-content img").each(function(){
-        imgArr.push($(this).attr("data-lazyload") || $(this).attr("src"));
+        var imgSrc = $(this).attr("data-lazyload") || $(this).attr("src");
+        imgSrc = imgSrc.replace("https:","http:");
+        imgArr.push(imgSrc);
       });
       return imgArr;
     });
-    // Õâ¸öÊÇÊä³öµÄÖµ
+    // å°†æ•°æ®è¿”å›
     console.log(JSON.stringify({
       code : 1,
       msg: imgMsg

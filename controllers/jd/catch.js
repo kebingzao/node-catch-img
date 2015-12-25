@@ -69,7 +69,7 @@ var getAllImg = function(imgSrcArr, fileName, url){
   //};
   var allImgSrcArr = {
     'intro_big_pics': _.map(imgSrcArr,function(item){
-      return item.replace("/n5/", '/n1/');
+      return item.replace("/n5/", '/n1/').replace("https:","http");
     })
   };
   // 开始一张张加载
