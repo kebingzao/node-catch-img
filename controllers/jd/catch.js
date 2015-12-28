@@ -10,7 +10,8 @@ var phantomjs = require('phantomjs');
 var binPath = phantomjs.path;
 
 var TMPFILE = 'tmp';
-
+// 请求是否超时
+var isTimeout = false;
 // 通过 phantom.js 获取页面中用js加载的东西
 // todo 京东的详情图片是不包含在页面的源代码里面的，而是通过页面的js加载出来的，因此要用phantom.js等页面加载完之后，再从dom里面取
 var getDetailImg = function(url){
@@ -135,19 +136,35 @@ module.exports = function (req, res, next) {
   // 根据换行符分行
   var urls = req.query["url"].split("\n");
   var total = urls.length;
+  res.setTimeout(total * 60000,function(){
+    console.log("响应超时.");
+    isTimeout = true;
+    res.send("响应超时");
+  });
   var count = 0;
-  var parentFileName = TMPFILE + "/" + "jd";
+  var unionId = "jd" + new Date().getTime();
+  var parentFileName = TMPFILE + "/" + unionId;
   var doSuccess = function(){
     if(count === total){
       // 接下来是保存
-      airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + "jd",function(zipName){
-        // 最后下载到本地
-        res.download(zipName);
-      });
+      if(isTimeout){
+        // 超时，直接删掉资源文件
+        airHelper.removeDir(parentFileName, function(){
+
+        });
+      }else{
+        airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + unionId,function(zipName){
+          // 最后下载到本地
+          // 清掉这个临时的目录，然后下载zip
+          airHelper.removeDir(parentFileName, function(){
+            res.download(zipName);
+          });
+        });
+      }
     }
   };
   // 首先清空tmp目录
-  airHelper.clearDir(TMPFILE, function(){
+  //airHelper.clearDir(TMPFILE, function(){
     // 接下来创建文件夹
     // 接下来创建一个对应文件
     airHelper.createDir(parentFileName, function(){
@@ -161,5 +178,5 @@ module.exports = function (req, res, next) {
         })(item.trim());
       });
     });
-  });
+  //});
 };
