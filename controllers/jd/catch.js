@@ -163,20 +163,17 @@ module.exports = function (req, res, next) {
       }
     }
   };
-  // 首先清空tmp目录
-  //airHelper.clearDir(TMPFILE, function(){
-    // 接下来创建文件夹
-    // 接下来创建一个对应文件
-    airHelper.createDir(parentFileName, function(){
-      // 获取dom
-      _.each(urls,function(item){
-        (function(url){
-          doCatchTheImg(url, parentFileName).then(function(){
-            count += 1;
-            doSuccess();
-          })
-        })(item.trim());
-      });
+  // 接下来创建文件夹
+  // 接下来创建一个对应文件
+  airHelper.createDir(parentFileName, function(){
+    // 获取dom
+    _.each(urls,function(item){
+      (function(url){
+        doCatchTheImg(url, parentFileName).then(function(){
+          count += 1;
+          doSuccess();
+        })
+      })(item.trim());
     });
-  //});
+  });
 };
