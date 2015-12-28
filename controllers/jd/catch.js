@@ -122,6 +122,7 @@ var doCatchTheImg = function(url, parentFileName){
     airHelper.createDir(fileName, function(){
       // 获取数据并下载
       getAllImg(imgSrcArr, fileName, url).then(function(){
+        console.log("成功加载一个，文件名为：" + fileName);
         defer.resolve();
       });
     });
@@ -135,45 +136,53 @@ var doCatchTheImg = function(url, parentFileName){
 module.exports = function (req, res, next) {
   // 根据换行符分行
   var urls = req.query["url"].split("\n");
-  var total = urls.length;
-  res.setTimeout(total * 60000,function(){
+  res.setTimeout(Math.max(urls.length * 60000, 30000),function(){
     console.log("响应超时.");
     isTimeout = true;
     res.send("响应超时");
   });
-  var count = 0;
   var unionId = "jd" + new Date().getTime();
   var parentFileName = TMPFILE + "/" + unionId;
   var doSuccess = function(){
-    if(count === total){
-      // 接下来是保存
-      if(isTimeout){
-        // 超时，直接删掉资源文件
-        airHelper.removeDir(parentFileName, function(){
+    // 接下来是保存
+    if(isTimeout){
+      // 超时，直接删掉资源文件
+      airHelper.removeDir(parentFileName, function(){
 
+      });
+    }else{
+      airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + unionId,function(zipName){
+        // 最后下载到本地
+        // 清掉这个临时的目录，然后下载zip
+        airHelper.removeDir(parentFileName, function(){
+          res.download(zipName);
         });
-      }else{
-        airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + unionId,function(zipName){
-          // 最后下载到本地
-          // 清掉这个临时的目录，然后下载zip
-          airHelper.removeDir(parentFileName, function(){
-            res.download(zipName);
-          });
-        });
-      }
+      });
+    }
+  };
+  // 改为单进程
+  var doCatch = function(){
+    if(urls.length > 0){
+      doCatchTheImg(urls.shift().trim(), parentFileName).then(function(){
+        doCatch();
+      })
+    }else{
+      doSuccess();
     }
   };
   // 接下来创建文件夹
   // 接下来创建一个对应文件
   airHelper.createDir(parentFileName, function(){
     // 获取dom
-    _.each(urls,function(item){
-      (function(url){
-        doCatchTheImg(url, parentFileName).then(function(){
-          count += 1;
-          doSuccess();
-        })
-      })(item.trim());
-    });
+    //_.each(urls,function(item){
+    //  (function(url){
+    //    doCatchTheImg(url, parentFileName).then(function(){
+    //      count += 1;
+    //      doSuccess();
+    //    })
+    //  })(item.trim());
+    //});
+    // 改为单进程，一条一条执行
+    doCatch();
   });
 };
