@@ -14,8 +14,8 @@ var TMPFILE = 'tmp';
 var isTimeout = false;
 // 通过 phantom.js 获取页面中用js加载的东西
 // todo 京东的详情图片是不包含在页面的源代码里面的，而是通过页面的js加载出来的，因此要用phantom.js等页面加载完之后，再从dom里面取
-var getDetailImg = function(url){
-  var defer = Q.defer();
+var getDetailImg = function(url, callback, count){
+  count = count || 0;
   var childArgs = [
     path.join(__dirname, '../../public/phantom/jd.js'),
     url
@@ -29,14 +29,19 @@ var getDetailImg = function(url){
       if(target.code == 1){
         // 返回详情图片数组
         console.log("使用phantom抓取图片成功：" + url);
-        defer.resolve(target.msg);
+        _.isFunction(callback) && callback(target.msg);
       }
     }catch(e){
       console.log("使用phantom抓取图片失败：" + url);
-      defer.reject();
+      if(count < 3){
+        console.log("phantom 抓取重试");
+        getDetailImg(url,callback, count + 1);
+      }else{
+        // 有问题，返回为空
+        _.isFunction(callback) && callback([]);
+      }
     }
   });
-  return defer.promise;
 };
 
 // 获取全部图片
@@ -95,7 +100,7 @@ var getAllImg = function(imgSrcArr, fileName, url){
     }
   };
   // 接下来就获取详情图片了
-  getDetailImg(url).then(function(arr){
+  getDetailImg(url,function(arr){
     allImgSrcArr.push({
       key: "descr",
       value: arr
