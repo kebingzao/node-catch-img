@@ -136,7 +136,8 @@ var doCatchTheImg = function(url, parentFileName){
 module.exports = function (req, res, next) {
   // 根据换行符分行
   var urls = req.query["url"].split("\n");
-  res.setTimeout(Math.max(urls.length * 60000, 30000),function(){
+  var total = urls.length;
+  res.setTimeout(Math.max(total * 60000, 30000),function(){
     console.log("响应超时.");
     isTimeout = true;
     res.send("响应超时");
@@ -155,6 +156,7 @@ module.exports = function (req, res, next) {
         // 最后下载到本地
         // 清掉这个临时的目录，然后下载zip
         airHelper.removeDir(parentFileName, function(){
+          console.log("成功抓取"+ total +"个商品");
           res.download(zipName);
         });
       });
@@ -162,12 +164,14 @@ module.exports = function (req, res, next) {
   };
   // 改为单进程
   var doCatch = function(){
-    if(urls.length > 0){
-      doCatchTheImg(urls.shift().trim(), parentFileName).then(function(){
-        doCatch();
-      })
-    }else{
-      doSuccess();
+    if(!isTimeout){
+      if(urls.length > 0){
+        doCatchTheImg(urls.shift().trim(), parentFileName).then(function(){
+          doCatch();
+        })
+      }else{
+        doSuccess();
+      }
     }
   };
   // 接下来创建文件夹
