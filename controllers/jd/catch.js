@@ -107,6 +107,7 @@ var getAllImg = function(imgSrcArr, fileName, url){
 var doCatchTheImg = function(url, parentFileName){
   var defer = Q.defer();
   // 京东的页面是gbk编码，所以要带上gbk，不然中文会乱码
+  console.log("开始抓取：" + url);
   airHelper.getPageData(url, 'gbk').then(function(data) {
     var $ = cheerio.load(data);
     var imgSrcArr = [];
@@ -122,8 +123,7 @@ var doCatchTheImg = function(url, parentFileName){
     airHelper.createDir(fileName, function(){
       // 获取数据并下载
       getAllImg(imgSrcArr, fileName, url).then(function(){
-        console.log("成功加载一个，文件名为：" + fileName);
-        defer.resolve();
+        defer.resolve(goodName);
       });
     });
   },function(){
@@ -135,7 +135,7 @@ var doCatchTheImg = function(url, parentFileName){
 // router js/catch
 module.exports = function (req, res, next) {
   // 根据换行符分行
-  var urls = req.query["url"].split("\n");
+  var urls = req.body["url"].split("\n");
   var total = urls.length;
   res.setTimeout(Math.max(total * 60000, 30000),function(){
     console.log("响应超时.");
@@ -166,7 +166,8 @@ module.exports = function (req, res, next) {
   var doCatch = function(){
     if(!isTimeout){
       if(urls.length > 0){
-        doCatchTheImg(urls.shift().trim(), parentFileName).then(function(){
+        doCatchTheImg(urls.shift().trim(), parentFileName).then(function(goodName){
+          console.log("成功抓取：" + goodName);
           doCatch();
         })
       }else{
