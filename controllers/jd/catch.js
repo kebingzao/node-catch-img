@@ -174,10 +174,15 @@ module.exports = function (req, res, next) {
   var doCatch = function(){
     if(!isTimeout){
       if(urls.length > 0){
-        doCatchTheImg(urls.shift().trim(), parentFileName).then(function(goodName){
-          console.log("成功抓取：" + goodName);
+        var url = urls.shift().trim();
+        if(url){
+          doCatchTheImg(url, parentFileName).then(function(goodName){
+            console.log("成功抓取：" + goodName);
+            doCatch();
+          });
+        }else{
           doCatch();
-        })
+        }
       }else{
         doSuccess();
       }
