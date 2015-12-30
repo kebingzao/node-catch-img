@@ -28,9 +28,11 @@ var getDetailImg = function(url){
       target = JSON.parse(target);
       if(target.code == 1){
         // 返回详情图片数组
+        console.log("使用phantom抓取图片成功：" + url);
         defer.resolve(target.msg);
       }
     }catch(e){
+      console.log("使用phantom抓取图片失败：" + url);
       defer.reject();
     }
   });
@@ -40,14 +42,6 @@ var getDetailImg = function(url){
 // 获取全部图片
 var getAllImg = function(imgSrcArr, fileName, url){
   var defer = Q.defer();
-  var tatalCount = 0;
-  var currentCount = 0;
-  var doSuccess = function(){
-    currentCount += 1;
-    if(currentCount === tatalCount){
-      defer.resolve();
-    }
-  };
 
   //todo 注意，这边只针对京东进行处理
   // todo http://img14.360buyimg.com/n5/jfs/t2053/317/924464287/25158/b0e589f2/5631d1a9N4668d62a.jpg
@@ -68,45 +62,45 @@ var getAllImg = function(imgSrcArr, fileName, url){
   //    return item.replace("/n5/", '/n1/');
   //  })
   //};
-  var allImgSrcArr = {
-    'intro_big_pics': _.map(imgSrcArr,function(item){
-      return item.replace("/n5/", '/n1/').replace("https:","http");
-    })
-  };
-  // 开始一张张加载
-  var doLoad = function(){
-    // 这时候总数有变
-    _.each(allImgSrcArr,function(item){
-      tatalCount += item.length;
-    });
-    // 接下来就循环一张一张下载
-    _.each(allImgSrcArr, function(itemArr, key){
-      // 这时候要先建对应的文件夹
-      (function(itemArr, key){
-        var detailFileName = fileName + "/" + key;
-        airHelper.createDir(detailFileName, function(){
-          // 接下来一张张下载
-          var count = -1;
-          var doCatchAndSaveImg = function(){
-            if(itemArr.length > 0){
-              count = count + 1;
-              var item = itemArr.shift();
-              var doTmpSuccess = function(){
-                doCatchAndSaveImg();
-                doSuccess();
-              };
-              airHelper.catchAndSaveImg(item, detailFileName + "/" + count).then(doTmpSuccess, doTmpSuccess);
-            }
-          };
-          doCatchAndSaveImg();
-        })
-      })(itemArr,key);
-    });
+  var allImgSrcArr = [
+    {
+      key: 'intro_big_pics',
+      value: _.map(imgSrcArr, function (item) {
+        return item.replace("/n5/", '/n1/').replace("https:", "http");
+      })
+    }
+  ];
+  // 接下来就循环一张一张下载
+  var doCatchAllImage = function(){
+    if(allImgSrcArr.length > 0){
+      var imgSrcObj = allImgSrcArr.shift();
+      var imgSrcArr = imgSrcObj.value;
+      var detailFileName = fileName + "/" + imgSrcObj.key;
+      airHelper.createDir(detailFileName, function(){
+        // 接下来一张张下载
+        var count = -1;
+        var doCatchAndSaveImg = function(){
+          if(imgSrcArr.length > 0){
+            count = count + 1;
+            airHelper.catchAndSaveImg(imgSrcArr.shift(), detailFileName + "/" + count).then(doCatchAndSaveImg, doCatchAndSaveImg);
+          }else{
+            doCatchAllImage();
+          }
+        };
+        doCatchAndSaveImg();
+      })
+    }else{
+      // 成功返回
+      defer.resolve();
+    }
   };
   // 接下来就获取详情图片了
   getDetailImg(url).then(function(arr){
-    allImgSrcArr["descr"] = arr;
-    doLoad();
+    allImgSrcArr.push({
+      key: "descr",
+      value: arr
+    });
+    doCatchAllImage();
   });
   return defer.promise;
 };
