@@ -181,6 +181,8 @@ module.exports = function (req, res, next) {
       }else{
         doSuccess();
       }
+    }else{
+      console.log("不应该进入到这里来");
     }
   };
   // 接下来创建文件夹
