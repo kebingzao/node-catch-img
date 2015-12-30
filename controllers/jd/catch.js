@@ -86,11 +86,19 @@ var getAllImg = function(imgSrcArr, fileName, url){
         var detailFileName = fileName + "/" + key;
         airHelper.createDir(detailFileName, function(){
           // 接下来一张张下载
-          _.each(itemArr, function(item,index){
-            (function(item, index){
-              airHelper.catchAndSaveImg(item, detailFileName + "/" + index).then(doSuccess, doSuccess);
-            })(item,index);
-          });
+          var count = -1;
+          var doCatchAndSaveImg = function(){
+            if(itemArr.length > 0){
+              count = count + 1;
+              var item = itemArr.shift();
+              var doTmpSuccess = function(){
+                doCatchAndSaveImg();
+                doSuccess();
+              };
+              airHelper.catchAndSaveImg(item, detailFileName + "/" + count).then(doTmpSuccess, doTmpSuccess);
+            }
+          };
+          doCatchAndSaveImg();
         })
       })(itemArr,key);
     });
