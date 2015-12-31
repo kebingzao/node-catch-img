@@ -80,14 +80,14 @@
             };
 
             $(function() {
-//                $("#importExcel").click(function(){
-//                    var activeTable = $(".tab-content .active");
-//                    var blob = new Blob([activeTable.find("table").get(0).outerHTML], {
-//                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
-//                    });
-//
-//                    saveAs(blob,  activeTable.find(".data-title").text() + "_" +activeTable.find(".data-time").text() + ".xls");
-//                })
+                $("#importExcel").click(function(){
+                    var activeTable = $(".tab-content .active");
+                    var blob = new Blob([activeTable.find("table").get(0).outerHTML], {
+                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+                    });
+
+                    saveAs(blob,  activeTable.find(".data-title").text() + "_" +activeTable.find(".data-time").text() + ".xls");
+                })
                 var checkBoxArr = [];
                 $(".checkbox").click(function(e){
                     var target = $(e.currentTarget);
