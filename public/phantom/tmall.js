@@ -1,4 +1,4 @@
-// phantom.js 用于抓取京东详细页
+// phantom.js 用于抓取天猫详细页
 
 function waitFor(testFx, onReady, timeOutMillis) {
   var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 3000, //< Default Max Timout is 3s
@@ -24,7 +24,7 @@ function waitFor(testFx, onReady, timeOutMillis) {
 }
 
 var page = require('webpage').create();
-//page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36';
+page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36';
 var url = "";
 if (phantom.args.length === 0) {
   console.log(JSON.stringify({
@@ -37,23 +37,22 @@ if (phantom.args.length === 0) {
 }
 console.log(url);
 page.open(url, function(status) {
-  if (status !== "success") {
-    console.log("Unable to access network");
-  } else {
-    waitFor(function() {
-      // Check in the page if a specific element is now visible
-      return page.evaluate(function() {
-        console.log(document.getElementById("description").innerText);
-        return document.getElementById("description").children[1].children.length > 1;
-      });
-    }, function() {
-      console.log("The sign-in dialog should be visible now.");
-      var imglength = page.evaluate(function() {
-        //return document.getElementById("description").innerText;
-        return document.getElementById("description").innerHTML;
-      });
-      console.log(imglength);
-      phantom.exit();
-    },10000);
-  }
+  page.includeJs( '/public/javascripts/jquery.min.js', function() {
+    // 处理数据
+    // todo 天猫的详情页图片抓取不到，估计他们的服务端有做处理，因此只能获取详情页的url，然后再请求这个，最后再加载详情页图片
+    var imgMsg = page.evaluate(function() {
+      var imgArr = [];
+      var lastIndex =  document.documentElement.innerHTML.lastIndexOf("httpsDescUrl");
+      var tmpMsg = document.documentElement.innerHTML.substr(lastIndex-1, 500);
+      // 得到详情页的链接
+      imgArr.push(tmpMsg.replace(/(.*)(httpsDescUrl":")(.*)("},"api.*)/g,'$3'));
+      return imgArr;
+    });
+    // 将数据返回
+    console.log(JSON.stringify({
+      code : 1,
+      msg: imgMsg
+    }));
+    phantom.exit();
+  });
 });

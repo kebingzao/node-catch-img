@@ -2,6 +2,8 @@ var cheerio = require("cheerio");
 var Q = require("q");
 var _ = require("underscore");
 var catchCommon = require('../common');
+var airHelper = require('../../../lib/helper');
+
 // 抓取天猫的商品数据
 module.exports = {
     // 配置
@@ -35,15 +37,33 @@ module.exports = {
           })
         }
       ];
-      // 使用phantom js 或者详情图片
+      // 使用phantom js 获取详情图片
       catchCommon.getDetailImg(url,function(arr){
-        allImgSrcArr.push({
-          key: "descr",
-          value: arr
-        });
-        defer.resolve({
-          imgArr: allImgSrcArr,
-          goodsName: goodName
+        // 得到url的txt页面，并直接请求
+        console.log("开始抓取天猫详情页：" + arr[0]);
+        airHelper.getPageData("http:" + arr[0]).then(function(data) {
+          var arr = [];
+          // 正则替换
+          data.replace(/src="(\S+)"/g, function(match,$1){
+            arr.push($1);
+          });
+          var newArr = [];
+          _.each(arr,function(item){
+            // 去掉分隔符
+            if(item.indexOf("spaceball") == -1){
+              newArr.push(item.replace("https","http"));
+            }
+          });
+          allImgSrcArr.push({
+            key: "descr",
+            value: newArr
+          });
+          defer.resolve({
+            imgArr: allImgSrcArr,
+            goodsName: goodName
+          });
+        },function(){
+          console.log("error");
         });
       },this.setting.phantomUrlName);
       return defer.promise;
