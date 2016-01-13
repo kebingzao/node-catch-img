@@ -2,33 +2,36 @@ var cheerio = require("cheerio");
 var Q = require("q");
 var _ = require("underscore");
 var catchCommon = require('../common');
-// 抓取京东的商品数据
+// 抓取天猫的商品数据
 module.exports = {
     // 配置
     setting: {
-      //京东的页面是gbk编码，所以要带上gbk，不然中文会乱码
+      //天猫的页面是gbk编码，所以要带上gbk，不然中文会乱码
       encoding: "gbk",
       // phantom 脚本的名字
-      phantomUrlName: "jd"
+      phantomUrlName: "tmall"
     },
     // 从抓取的页面获取商品信息
     getGoodsData: function(data,url){
       var defer = Q.defer();
       var $ = cheerio.load(data);
       var imgSrcArr = [];
-      $(".spec-items li img").each(function(i, e) {
-        imgSrcArr.push("http:" + $(e).attr("src"));
+      $("#J_UlThumb li img").each(function(i, e) {
+        var imgSrc = $(e).attr("src");
+        if(imgSrc.indexOf("http") != 0){
+          imgSrc = "http:" + imgSrc
+        }
+        imgSrcArr.push(imgSrc);
       });
       // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
-      var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
-      // todo http://img14.360buyimg.com/n5/jfs/t2053/317/924464287/25158/b0e589f2/5631d1a9N4668d62a.jpg
-      // 只要把链接中的n5，改成n4，n3，n2，n1，就可以下载对应的图片
-      // 目前只抓n1，并把n1改成 intro_big_pics
+      var goodName = $(".tb-detail-hd h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
+      // todo https://img.alicdn.com/bao/uploaded/i3/TB1gALrJpXXXXXyXXXXXXXXXXXX_!!0-item_pic.jpg_60x60q90.jpg
+      // 只要把链接中的60x60改成 430x430
       var allImgSrcArr = [
         {
           key: 'intro_big_pics',
           value: _.map(imgSrcArr, function (item) {
-            return item.replace("/n5/", '/n1/').replace("https:", "http");
+            return item.replace("60x60", '430x430').replace("https:", "http");
           })
         }
       ];

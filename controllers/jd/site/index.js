@@ -1,3 +1,4 @@
 module.exports = {
-  jd: require('./jd')
+  jd: require('./jd'),
+  tmall: require('./tmall')
 };
