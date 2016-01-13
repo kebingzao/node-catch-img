@@ -1,155 +1,21 @@
-var cheerio = require("cheerio");
-var fs = require("fs");
-var Q = require("q");
-var _ = require("underscore");
 var airHelper = require('../../lib/helper');
-
-var path = require('path');
-var childProcess = require('child_process');
-var phantomjs = require('phantomjs');
-var binPath = phantomjs.path;
-
+var catchCommon = require('./common');
+var siteCatch = require("./site");
 var TMPFILE = 'tmp';
-// 请求是否超时
-var isTimeout = false;
-// 通过 phantom.js 获取页面中用js加载的东西
-// todo 京东的详情图片是不包含在页面的源代码里面的，而是通过页面的js加载出来的，因此要用phantom.js等页面加载完之后，再从dom里面取
-var getDetailImg = function(url, callback, count){
-  count = count || 0;
-  var childArgs = [
-    path.join(__dirname, '../../public/phantom/jd.js'),
-    url
-  ];
-  childProcess.execFile(binPath, childArgs, function(err, stdout, stderr) {
-    var firstIndex = stdout.indexOf('{"code');
-    var lastIndex = stdout.indexOf('"]}');
-    var target = stdout.substr(firstIndex, lastIndex - firstIndex + 3);
-    try{
-      target = JSON.parse(target);
-      if(target.code == 1){
-        // 返回详情图片数组
-        console.log("使用phantom抓取图片成功：" + url);
-        _.isFunction(callback) && callback(target.msg);
-      }
-    }catch(e){
-      console.log("使用phantom抓取图片失败：" + url);
-      if(count < 3){
-        console.log("phantom 抓取重试");
-        getDetailImg(url,callback, count + 1);
-      }else{
-        // 有问题，返回为空
-        _.isFunction(callback) && callback([]);
-      }
-    }
-  });
-};
-
-// 获取全部图片
-var getAllImg = function(imgSrcArr, fileName, url){
-  var defer = Q.defer();
-
-  //todo 注意，这边只针对京东进行处理
-  // todo http://img14.360buyimg.com/n5/jfs/t2053/317/924464287/25158/b0e589f2/5631d1a9N4668d62a.jpg
-  // 只要把链接中的n5，改成n4，n3，n2，n1，就可以下载对应的图片
-  // 目前只抓n1，并把n1改成 intro_big_pics
-  //var allImgSrcArr = {
-  //  'n5': imgSrcArr,
-  //  'n4': _.map(imgSrcArr,function(item){
-  //    return item.replace("/n5/", '/n4/');
-  //  }),
-  //  'n3': _.map(imgSrcArr,function(item){
-  //    return item.replace("/n5/", '/n3/');
-  //  }),
-  //  'n2': _.map(imgSrcArr,function(item){
-  //    return item.replace("/n5/", '/n2/');
-  //  }),
-  //  'n1': _.map(imgSrcArr,function(item){
-  //    return item.replace("/n5/", '/n1/');
-  //  })
-  //};
-  var allImgSrcArr = [
-    {
-      key: 'intro_big_pics',
-      value: _.map(imgSrcArr, function (item) {
-        return item.replace("/n5/", '/n1/').replace("https:", "http");
-      })
-    }
-  ];
-  // 接下来就循环一张一张下载
-  var doCatchAllImage = function(){
-    if(allImgSrcArr.length > 0){
-      var imgSrcObj = allImgSrcArr.shift();
-      var imgSrcArr = imgSrcObj.value;
-      var detailFileName = fileName + "/" + imgSrcObj.key;
-      airHelper.createDir(detailFileName, function(){
-        // 接下来一张张下载
-        var count = -1;
-        var doCatchAndSaveImg = function(){
-          if(imgSrcArr.length > 0){
-            count = count + 1;
-            airHelper.catchAndSaveImg(imgSrcArr.shift(), detailFileName + "/" + count).then(doCatchAndSaveImg, doCatchAndSaveImg);
-          }else{
-            doCatchAllImage();
-          }
-        };
-        doCatchAndSaveImg();
-      })
-    }else{
-      // 成功返回
-      defer.resolve();
-    }
-  };
-  // 接下来就获取详情图片了
-  getDetailImg(url,function(arr){
-    allImgSrcArr.push({
-      key: "descr",
-      value: arr
-    });
-    doCatchAllImage();
-  });
-  return defer.promise;
-};
-
-// 下载每一个url对应的图片
-var doCatchTheImg = function(url, parentFileName){
-  var defer = Q.defer();
-  // 京东的页面是gbk编码，所以要带上gbk，不然中文会乱码
-  console.log("开始抓取：" + url);
-  airHelper.getPageData(url, 'gbk').then(function(data) {
-    var $ = cheerio.load(data);
-    var imgSrcArr = [];
-    $(".spec-items li img").each(function(i, e) {
-      imgSrcArr.push("http:" + $(e).attr("src"));
-    });
-    // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
-    var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
-    console.log(goodName);
-    var fileName = parentFileName + "/" + goodName;
-    // 接下来创建文件夹
-    // 接下来创建一个对应文件
-    airHelper.createDir(fileName, function(){
-      // 获取数据并下载
-      getAllImg(imgSrcArr, fileName, url).then(function(){
-        defer.resolve(goodName);
-      });
-    });
-  },function(){
-    console.log("error");
-  });
-  return defer.promise;
-};
 
 // router js/catch
 module.exports = function (req, res, next) {
   // 根据换行符分行
   var urls = req.body["url"].split("\n");
   var total = urls.length;
+  // 是否超时
+  var isTimeout = false;
   res.setTimeout(Math.max(total * 60000, 30000),function(){
     console.log("响应超时.");
     isTimeout = true;
     res.send("响应超时");
   });
-  var unionId = "jd" + new Date().getTime();
+  var unionId = "goodsCacth_" + new Date().getTime();
   var parentFileName = TMPFILE + "/" + unionId;
   var doSuccess = function(){
     // 接下来是保存
@@ -175,9 +41,24 @@ module.exports = function (req, res, next) {
       if(urls.length > 0){
         var url = urls.shift().trim();
         if(url){
-          doCatchTheImg(url, parentFileName).then(function(goodName){
-            console.log("成功抓取：" + goodName);
-            doCatch();
+          // 默认京东的处理方式
+          var catchHandler = siteCatch["jd"];
+          // 判断是否是天猫
+          if(url.indexOf("detail.tmall.com") > -1){
+            catchHandler = siteCatch["tmall"];
+          }
+          catchCommon.doCatchTheImg(url, catchHandler.setting).then(function(data){
+            catchHandler.getGoodsData(data, url).then(function(goodsData){
+              var fileName = parentFileName + "/" + goodsData.goodsName;
+              // 接下来创建一个对应文件夹
+              airHelper.createDir(fileName, function(){
+                // 获取数据并下载
+                catchCommon.getAllImg(goodsData.imgArr, fileName).then(function(){
+                  console.log("成功抓取：" + goodsData.goodsName);
+                  doCatch();
+                });
+              });
+            });
           });
         }else{
           doCatch();
