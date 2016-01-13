@@ -32,7 +32,6 @@ module.exports = {
           })
         }
       ];
-      console.log(allImgSrcArr);
       // 使用phantom js 或者详情图片
       catchCommon.getDetailImg(url,function(arr){
         allImgSrcArr.push({
