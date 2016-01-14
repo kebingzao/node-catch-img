@@ -12,7 +12,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3199');
+var port = normalizePort(process.env.PORT || '3099');
 app.set('port', port);
 
 /**
@@ -89,5 +89,5 @@ function onListening() {
   debug('Listening on ' + bind);
   console.log("启动定时任务");
   require("../controllers/duobao/scheduleCatch");
-  require("../controllers/jd/schedeluClearTmp");
+  require("../controllers/goods/schedeluClearTmp");
 }

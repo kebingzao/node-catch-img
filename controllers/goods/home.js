@@ -1,4 +1,4 @@
-// router jd/
+// router goods/
 module.exports = function (req, res, next) {
-  res.render('jd', {});
+  res.render('goods', {});
 };

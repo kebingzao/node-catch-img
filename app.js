@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var jd = require('./routes/jd');
+var goods = require('./routes/goods');
 var aso = require('./routes/aso');
 var duobao = require('./routes/duobao');
 
@@ -24,7 +24,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/jd', jd);
+app.use('/goods', goods);
 app.use('/aso', aso);
 app.use('/duobao', duobao);
 
