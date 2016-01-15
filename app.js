@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var goods = require('./routes/goods');
+var comment = require('./routes/comment');
 var aso = require('./routes/aso');
 var duobao = require('./routes/duobao');
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/goods', goods);
+app.use('/comment', comment);
 app.use('/aso', aso);
 app.use('/duobao', duobao);
 
