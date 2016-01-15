@@ -19,7 +19,7 @@ module.exports = {
       var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
       var originImgArr = [];
       // 最大页数
-      var maxPage = 10;
+      var maxPage = 2;
       var getPageUrl = function(index){
         return 'http://club.jd.com/productpage/p-'+ id +'-s-4-t-3-p-'+ index +'.html';
       };

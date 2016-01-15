@@ -6,46 +6,45 @@ var path = require('path');
 var childProcess = require('child_process');
 var phantomjs = require('phantomjs');
 var binPath = phantomjs.path;
-var siteCatch = require("./site");
 
 module.exports = {
   // 下载每一个url对应的图片
-  doCatchTheImg: function(url, option){
+  doCatchTheImg: function (url, option) {
     var defer = Q.defer();
     console.log("开始抓取：" + url);
-    airHelper.getPageData(url, option.encoding).then(function(data) {
+    airHelper.getPageData(url, option.encoding).then(function (data) {
       defer.resolve(data);
-    },function(){
+    }, function () {
       console.log("error");
     });
     return defer.promise;
   },
   // 通过 phantom.js 获取页面中用js加载的东西
   // todo 京东的详情图片是不包含在页面的源代码里面的，而是通过页面的js加载出来的，因此要用phantom.js等页面加载完之后，再从dom里面取
-  getDetailImg: function(url, callback, phantomUrlName, count){
+  getDetailImg: function (url, callback, phantomUrlName, count) {
     count = count || 0;
     var self = this;
     var childArgs = [
-      path.join(__dirname, '../../public/phantom/'+ phantomUrlName +'.js'),
+      path.join(__dirname, '../../public/phantom/' + phantomUrlName + '.js'),
       url
     ];
-    childProcess.execFile(binPath, childArgs, function(err, stdout, stderr) {
+    childProcess.execFile(binPath, childArgs, function (err, stdout, stderr) {
       var firstIndex = stdout.indexOf('{"code');
       var lastIndex = stdout.indexOf('"]}');
       var target = stdout.substr(firstIndex, lastIndex - firstIndex + 3);
-      try{
+      try {
         target = JSON.parse(target);
-        if(target.code == 1){
+        if (target.code == 1) {
           // 返回详情图片数组
           console.log("使用phantom抓取图片成功：" + url);
           _.isFunction(callback) && callback(target.msg);
         }
-      }catch(e){
+      } catch (e) {
         console.log("使用phantom抓取图片失败：" + url);
-        if(count < 3){
+        if (count < 3) {
           console.log("phantom 抓取重试");
-          self.getDetailImg(url,callback, phantomUrlName, count + 1);
-        }else{
+          self.getDetailImg(url, callback, phantomUrlName, count + 1);
+        } else {
           // 有问题，返回为空
           _.isFunction(callback) && callback([]);
         }
@@ -53,28 +52,28 @@ module.exports = {
     });
   },
   // 获取全部图片
-  getAllImg: function(imgArr, fileName){
+  getAllImg: function (imgArr, fileName) {
     var defer = Q.defer();
     // 接下来就循环一张一张下载
-    var doCatchAllImage = function(){
-      if(imgArr.length > 0){
+    var doCatchAllImage = function () {
+      if (imgArr.length > 0) {
         var imgSrcObj = imgArr.shift();
         var imgSrcArr = imgSrcObj.value;
         var detailFileName = fileName + "/" + imgSrcObj.key;
-        airHelper.createDir(detailFileName, function(){
+        airHelper.createDir(detailFileName, function () {
           // 接下来一张张下载
           var count = -1;
-          var doCatchAndSaveImg = function(){
-            if(imgSrcArr.length > 0){
+          var doCatchAndSaveImg = function () {
+            if (imgSrcArr.length > 0) {
               count = count + 1;
               airHelper.catchAndSaveImg(imgSrcArr.shift(), detailFileName + "/" + count).then(doCatchAndSaveImg, doCatchAndSaveImg);
-            }else{
+            } else {
               doCatchAllImage();
             }
           };
           doCatchAndSaveImg();
         })
-      }else{
+      } else {
         // 成功返回
         defer.resolve();
       }
@@ -83,7 +82,8 @@ module.exports = {
     return defer.promise;
   },
   // 抓取图片的常规操作
-  catchImgSimpleHandle: function(req, res, next, opt){
+  catchImgSimpleHandle: function (req, res, next, opt) {
+    var siteCatch = require("./site");
     var self = this;
     var TMPFILE = 'tmp';
     // 根据换行符分行
@@ -93,78 +93,78 @@ module.exports = {
     var total = urls.length;
     // 是否超时
     var isTimeout = false;
-    res.setTimeout(Math.max(total * (opt.timeout || 60000), 30000),function(){
+    res.setTimeout(Math.max(total * (opt.timeout || 60000), 30000), function () {
       console.log("响应超时.");
       //isTimeout = true;
       res.send("响应超时");
     });
     var unionId = "goodsCatch_" + new Date().getTime();
     var parentFileName = TMPFILE + "/" + unionId;
-    var doSuccess = function(){
+    var doSuccess = function () {
       // 接下来是保存
-      if(isTimeout){
+      if (isTimeout) {
         // 超时，直接删掉资源文件
-        airHelper.removeDir(parentFileName, function(){
+        airHelper.removeDir(parentFileName, function () {
 
         });
-      }else{
-        airHelper.writeZip(parentFileName + "/",TMPFILE + "/" + unionId,function(zipName){
+      } else {
+        airHelper.writeZip(parentFileName + "/", TMPFILE + "/" + unionId, function (zipName) {
           // 最后下载到本地
           // 清掉这个临时的目录，然后下载zip
-          airHelper.removeDir(parentFileName, function(){
-            console.log("成功抓取"+ total +"个商品");
+          airHelper.removeDir(parentFileName, function () {
+            console.log("成功抓取" + total + "个商品");
             res.download(zipName);
           });
         });
       }
     };
     // 改为单进程
-    var doCatch = function(){
-      if(!isTimeout){
-        if(urls.length > 0){
+    var doCatch = function () {
+      if (!isTimeout) {
+        if (urls.length > 0) {
           var url = urls.shift().trim();
-          if(url){
+          if (url) {
             var catchHandler = null;
             // 判断处理方式
             // 默认京东的处理方式
-            switch(opt.active){
+            switch (opt.active) {
               case "comment":
                 catchHandler = siteCatch["commentJd"];
                 break;
               default:
                 // 判断是否是天猫
                 catchHandler = siteCatch["catchJd"];
-                if(url.indexOf("detail.tmall.com") > -1){
+                if (url.indexOf("detail.tmall.com") > -1) {
                   catchHandler = siteCatch["catchTmall"];
                 }
                 break;
             }
-            self.doCatchTheImg(url, catchHandler.setting).then(function(data){
-              catchHandler.getGoodsData(data, url, req.body).then(function(goodsData){
+            self.doCatchTheImg(url, catchHandler.setting).then(function (data) {
+              catchHandler.getGoodsData(data, url, req.body).then(function (goodsData) {
                 var fileName = parentFileName + "/" + goodsData.goodsName;
                 // 接下来创建一个对应文件夹
-                airHelper.createDir(fileName, function(){
+                airHelper.createDir(fileName, function () {
                   // 获取数据并下载
-                  self.getAllImg(goodsData.imgArr, fileName).then(function(){
+                  self.getAllImg(goodsData.imgArr, fileName).then(function () {
                     console.log("成功抓取：" + goodsData.goodsName);
                     doCatch();
                   });
                 });
               });
             });
-          }else{
+          } else {
             doCatch();
           }
-        }else{
+        } else {
           doSuccess();
         }
-      }else{
+      } else {
         console.log("不应该进入到这里来");
       }
     };
     // 接下来创建文件夹
     // 接下来创建一个对应文件
-    airHelper.createDir(parentFileName, function(){
+    airHelper.createDir(parentFileName, function () {
       // 改为单进程，一条一条执行
       doCatch();
     });
