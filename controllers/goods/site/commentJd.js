@@ -18,12 +18,15 @@ module.exports = {
       // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
       var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
       var originImgArr = [];
+      var count = parseInt(reqBody["start"]) || 0;
       // 最大页数
-      var maxPage = 2;
+      var maxPage = parseInt(reqBody["end"]);
+      if(maxPage < count){
+        maxPage = count + 10;
+      }
       var getPageUrl = function(index){
         return 'http://club.jd.com/productpage/p-'+ id +'-s-4-t-3-p-'+ index +'.html';
       };
-      var count = 0;
       var doCatch = function(){
         if(count > maxPage){
           defer.resolve({
