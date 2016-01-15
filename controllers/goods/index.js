@@ -1,4 +1,5 @@
 module.exports = {
   home: require('./home'),
-  catch: require('./catch')
+  catch: require('./catch'),
+  comment: require('./comment')
 };
