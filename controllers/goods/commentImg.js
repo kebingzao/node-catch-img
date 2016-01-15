@@ -3,19 +3,19 @@ var catchCommon = require('./common');
 var siteCatch = require("./site");
 var TMPFILE = 'tmp';
 
-// router goods/catch
+// router goods/commentImg
 module.exports = function (req, res, next) {
   // 根据换行符分行
   var urls = req.body["url"].split("\n");
   var total = urls.length;
   // 是否超时
   var isTimeout = false;
-  res.setTimeout(Math.max(total * 60000, 30000),function(){
+  res.setTimeout(Math.max(total * 100000, 30000),function(){
     console.log("响应超时.");
     //isTimeout = true;
     res.send("响应超时");
   });
-  var unionId = "goodsCacth_" + new Date().getTime();
+  var unionId = "goodsComment_" + new Date().getTime();
   var parentFileName = TMPFILE + "/" + unionId;
   var doSuccess = function(){
     // 接下来是保存
@@ -42,12 +42,13 @@ module.exports = function (req, res, next) {
         var url = urls.shift().trim();
         if(url){
           // 默认京东的处理方式
-          var catchHandler = siteCatch["catchJd"];
+          var catchHandler = siteCatch["commentJd"];
           // 判断是否是天猫
           if(url.indexOf("detail.tmall.com") > -1){
             catchHandler = siteCatch["catchTmall"];
           }
           catchCommon.doCatchTheImg(url, catchHandler.setting).then(function(data){
+            console.log("页面下来了");
             catchHandler.getGoodsData(data, url).then(function(goodsData){
               var fileName = parentFileName + "/" + goodsData.goodsName;
               // 接下来创建一个对应文件夹

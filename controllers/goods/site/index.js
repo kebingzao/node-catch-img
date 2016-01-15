@@ -1,4 +1,5 @@
 module.exports = {
   catchJd: require('./catchJd'),
-  catchTmall: require('./catchTmall')
+  catchTmall: require('./catchTmall'),
+  commentJd: require('./commentJd')
 };
