@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
   var isTimeout = false;
   res.setTimeout(Math.max(total * 60000, 30000),function(){
     console.log("响应超时.");
-    isTimeout = true;
+    //isTimeout = true;
     res.send("响应超时");
   });
   var unionId = "goodsCacth_" + new Date().getTime();
