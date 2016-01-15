@@ -11,7 +11,7 @@ module.exports = {
       encoding: "gbk"
     },
     // 从抓取的页面获取商品信息
-    getGoodsData: function(data,url){
+    getGoodsData: function(data,url, reqBody){
       var defer = Q.defer();
       var $ = cheerio.load(data);
       var id = url.replace(/(.*item\.jd\.com\/)(\S+)(\.html.*)/g, '$2');
