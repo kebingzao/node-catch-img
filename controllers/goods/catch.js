@@ -42,10 +42,10 @@ module.exports = function (req, res, next) {
         var url = urls.shift().trim();
         if(url){
           // 默认京东的处理方式
-          var catchHandler = siteCatch["jd"];
+          var catchHandler = siteCatch["catchJd"];
           // 判断是否是天猫
           if(url.indexOf("detail.tmall.com") > -1){
-            catchHandler = siteCatch["tmall"];
+            catchHandler = siteCatch["catchTmall"];
           }
           catchCommon.doCatchTheImg(url, catchHandler.setting).then(function(data){
             catchHandler.getGoodsData(data, url).then(function(goodsData){

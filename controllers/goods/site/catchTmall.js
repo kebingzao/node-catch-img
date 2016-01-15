@@ -11,7 +11,7 @@ module.exports = {
       //天猫的页面是gbk编码，所以要带上gbk，不然中文会乱码
       encoding: "gbk",
       // phantom 脚本的名字
-      phantomUrlName: "tmall"
+      phantomUrlName: "catchTmall"
     },
     // 从抓取的页面获取商品信息
     getGoodsData: function(data,url){
