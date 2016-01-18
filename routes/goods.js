@@ -8,5 +8,7 @@ router.get('/', goods.home);
 router.post('/catch', goods.catch);
 router.get('/commentImg', goods.commentImgGet);
 router.post('/commentImg', goods.commentImgPost);
+router.get('/commentText', goods.commentTextGet);
+router.post('/commentText', goods.commentTextPost);
 
 module.exports = router;
