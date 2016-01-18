@@ -6,7 +6,7 @@ var router = express.Router();
 
 router.get('/', goods.home);
 router.post('/catch', goods.catch);
-router.get('/comment', goods.comment);
-router.post('/commentImg', goods.commentImg);
+router.get('/commentImg', goods.commentImgGet);
+router.post('/commentImg', goods.commentImgPost);
 
 module.exports = router;
