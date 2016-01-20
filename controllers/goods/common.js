@@ -89,7 +89,7 @@ module.exports = {
     // 根据换行符分行
     opt = opt || {};
     opt.active = opt.active || "catch";
-    var urls = req.body["url"].split("\n");
+    var urls = opt.urls || (req.body["url"].split("\n"));
     var total = urls.length;
     // 是否超时
     var isTimeout = false;
@@ -140,7 +140,7 @@ module.exports = {
                 break;
             }
             self.doCatchTheImg(url, catchHandler.setting).then(function (data) {
-              catchHandler.getGoodsData(data, url, req.body).then(function (goodsData) {
+              catchHandler.getGoodsData(data, url, opt).then(function (goodsData) {
                 var fileName = parentFileName + "/" + goodsData.goodsName;
                 // 接下来创建一个对应文件夹
                 airHelper.createDir(fileName, function () {

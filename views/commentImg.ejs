@@ -9,8 +9,8 @@
     <h1 class="text-center">针对京东抓取评论素材</h1>
     <form method="post" class="form-horizontal" role="form" action="/goods/commentImg">
         <div class="form-group">
-          <textarea rows="10" name="url" class="form-control" required placeholder="输入你要抓取的京东的商品页面，比如： http://item.jd.com/2025639.html, 如果有多个的话换行显示">http://item.jd.com/2025639.html</textarea>
-          <br>要请求的页数(1页10条)：<input type="number" name="start" value="0" /> ---- <input type="number" name="end" value="10" /><br>
+          <textarea rows="10" name="url" class="form-control" required placeholder="输入你要抓取的京东的商品页面，比如： http://item.jd.com/2025639.html, 如果有多个的话换行显示">http://item.jd.com/2025639.html,0,5</textarea>
+          <br>ps: 每一行都要包括三个参数，用英文逗号隔开，分别是 链接,开始页数,结束页数<br>
           <button id="getBtn" style="margin-top: 20px" class="btn btn-primary">抓取</button>
         </div>
     </form>

@@ -11,16 +11,17 @@ module.exports = {
       encoding: "gbk"
     },
     // 从抓取的页面获取商品信息
-    getGoodsData: function(data,url, reqBody){
+    getGoodsData: function(data,url, opt){
       var defer = Q.defer();
       var $ = cheerio.load(data);
       var id = url.replace(/(.*item\.jd\.com\/)(\S+)(\.html.*)/g, '$2');
       // 这边要用text，不然中文会乱码, 同时还要过滤掉一些敏感字符
       var goodName = $("#name h1").text().trim().replace(/[`~!@#$^&*()+=|\[\]\{\}:;'\,.<>/?]/g, "");
       var originImgArr = [];
-      var count = parseInt(reqBody["start"]) || 0;
+      var urlSetting = opt.urlsSetting[url];
+      var count = urlSetting.start || 0;
       // 最大页数
-      var maxPage = parseInt(reqBody["end"]);
+      var maxPage = urlSetting.end;
       if(maxPage < count){
         maxPage = count + 10;
       }
