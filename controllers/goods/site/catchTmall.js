@@ -51,6 +51,9 @@ module.exports = {
           _.each(arr,function(item){
             // 去掉分隔符
             if(item.indexOf("spaceball") == -1){
+              if(item.substr(0,2) === '//'){
+                item = 'http:' + item;
+              }
               newArr.push(item.replace("https","http"));
             }
           });

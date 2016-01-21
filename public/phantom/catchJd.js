@@ -21,6 +21,9 @@ page.open(url, function(status) {
       var imgArr = [];
       $("#J-detail-content img").each(function(){
         var imgSrc = $(this).attr("data-lazyload") || $(this).attr("src");
+        if(imgSrc.substr(0,2) === '//'){
+          imgSrc = 'http:' + imgSrc;
+        }
         imgSrc = imgSrc.replace("https:","http:");
         imgArr.push(imgSrc);
       });
