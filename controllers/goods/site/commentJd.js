@@ -46,13 +46,23 @@ module.exports = {
           airHelper.getPageData(getPageUrl(count)).then(function(data) {
             // 获取数据并下载
             //console.log(data);
-            data = JSON.parse(data);
-            _.each(data.comments,function(comments){
-              _.each(comments.images,function(item){
-                // 先取340
-                originImgArr.push(item.imgUrl);
-              });
-            });
+            try{
+              if(data){
+                data = JSON.parse(data);
+                if(data.comments && data.comments.length > 0){
+                  _.each(data.comments,function(comments){
+                    _.each(comments.images,function(item){
+                      // 先取340
+                      originImgArr.push(item.imgUrl);
+                    });
+                  });
+                }
+              }else{
+                count = maxPage;
+              }
+            }catch(e){
+              count = maxPage;
+            }
             count += 1;
             doCatch();
           },function(){
