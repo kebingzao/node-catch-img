@@ -20,6 +20,7 @@ var doCatch = function(){
       pageData.data = data;
       // 插入数据库
       duobao_global.insertSiteData(site, pageData).then(function(pageData){
+        console.log("抓取站点成功：" + site);
         doCatch();
       });
     });
