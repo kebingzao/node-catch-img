@@ -1,15 +1,13 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var log4js = require('log4js');
 var routes = require('./routes/index');
 var goods = require('./routes/goods');
 var aso = require('./routes/aso');
 var duobao = require('./routes/duobao');
-
 var app = express();
 
 // view engine setup
@@ -17,11 +15,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+var logger = require("./lib/log")(app.get('env')).logger;
+app.use(log4js.connectLogger(logger, {level:log4js.levels.INFO}));
 
 app.use('/', routes);
 app.use('/goods', goods);
@@ -58,6 +57,7 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
 
 <!-- REMOVE START -->
 //livereload = require('livereload');
