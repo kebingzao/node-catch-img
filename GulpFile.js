@@ -10,7 +10,7 @@ var gulp = require('gulp'),
 var BUILD_DIR = path.join(__dirname, 'build');
 var WORKSPACE_DIR = path.join(__dirname, './');
 var BUILD_TIME = gutil.date('yymmddHHMM');
-var noCopyDir = [".git", ".idea", "backup", "bower_components", "build", "node_modules"];
+var noCopyDir = [".git", "log", ".idea", "backup", "bower_components", "build", "node_modules"];
 var noCopyFile = ["*.zip"];
 // Clean
 gulp.task('clean', function() {
