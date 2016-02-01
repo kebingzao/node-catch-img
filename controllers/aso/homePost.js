@@ -9,6 +9,7 @@ module.exports = function (req, res, next) {
     th: ['名次','图标','名字','厂商'],
     td: []
   };
+  console.log("aso 开始抓取数据");
   // 获取dom
   airHelper.getPageData(url).then(function(data) {
     // 获取数据并下载

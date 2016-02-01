@@ -21,6 +21,7 @@
     "del": "^2.2.0",
     "ejs": "^2.3.4",
     "express-ejs-layouts": "^2.0.0",
+    "faye-websocket": "^0.10.0",
     "gbk": "^0.1.0",
     "gulp": "^3.9.0",
     "gulp-copy": "0.0.2",
