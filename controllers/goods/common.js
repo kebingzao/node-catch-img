@@ -130,6 +130,9 @@ module.exports = {
             switch (opt.active) {
               case "comment":
                 catchHandler = siteCatch["commentJd"];
+                if (url.indexOf("detail.tmall.com") > -1) {
+                  catchHandler = siteCatch["commentTmall"];
+                }
                 break;
               default:
                 // 判断是否是天猫
