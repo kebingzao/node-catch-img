@@ -26,7 +26,10 @@ module.exports = {
         maxPage = count + 10;
       }
       var getPageUrl = function(index){
-        return 'http://club.jd.com/productpage/p-'+ id +'-s-4-t-3-p-'+ index +'.html';
+        // 有图的评价
+        //return 'http://club.jd.com/productpage/p-'+ id +'-s-4-t-3-p-'+ index +'.html';
+        // 总的评价， 不一定有图
+        return 'http://club.jd.com/productpage/p-'+ id +'-s-0-t-3-p-'+ index +'.html';
       };
       var doCatch = function(){
         if(count > maxPage){
