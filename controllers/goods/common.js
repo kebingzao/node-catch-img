@@ -12,7 +12,7 @@ module.exports = {
   doCatchTheImg: function (url, option) {
     var defer = Q.defer();
     console.log("开始抓取：" + url);
-    airHelper.getPageData(url, option.encoding).then(function (data) {
+    airHelper.getPageData(url, option && option.encoding).then(function (data) {
       defer.resolve(data);
     }, function () {
       console.log("error");
@@ -132,6 +132,8 @@ module.exports = {
                 catchHandler = siteCatch["commentJd"];
                 if (url.indexOf("detail.tmall.com") > -1) {
                   catchHandler = siteCatch["commentTmall"];
+                }else if(url.indexOf("product.suning.com") > -1){
+                  catchHandler = siteCatch["commentSN"];
                 }
                 break;
               default:

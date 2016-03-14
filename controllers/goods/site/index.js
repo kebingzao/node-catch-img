@@ -3,5 +3,6 @@ module.exports = {
   catchTmall: require('./catchTmall'),
   commentJd: require('./commentJd'),
   commentTmall: require('./commentTmall'),
+  commentSN: require('./commentSN'),
   commentWY: require('./commentWY')
 };
