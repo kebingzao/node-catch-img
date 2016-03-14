@@ -52,7 +52,7 @@ module.exports = {
               if(data){
                 data = "{" + data.trim() + "}";
                 data = JSON.parse(data);
-                data.rateDetail.paginator && (maxPage = data.rateDetail.paginator.lastPage);
+                data.rateDetail.paginator && (maxPage = Math.min(maxPage, data.rateDetail.paginator.lastPage));
                 if(data.rateDetail.rateList && data.rateDetail.rateList.length > 0){
                   _.each(data.rateDetail.rateList,function(comments){
                     _.each(comments.pics,function(item){
