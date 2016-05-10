@@ -125,6 +125,9 @@ module.exports = {
           var url = urls.shift().trim();
           if (url) {
             var catchHandler = null;
+            if(url.indexOf("https") == 0){
+              url = url.replace('https', 'http');
+            }
             // 判断处理方式
             // 默认京东的处理方式
             switch (opt.active) {
@@ -141,6 +144,8 @@ module.exports = {
                 catchHandler = siteCatch["catchJd"];
                 if (url.indexOf("detail.tmall.com") > -1) {
                   catchHandler = siteCatch["catchTmall"];
+                }else if(url.indexOf("item.taobao.com") > -1){
+                  catchHandler = siteCatch["catchTaobao"];
                 }
                 break;
             }
