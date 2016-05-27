@@ -8,6 +8,9 @@ module.exports = function (req, res, next) {
         if(item){
             var tmpArr = item.trim().split(",");
             var tmpUrl = tmpArr[0].trim();
+            if(tmpUrl.indexOf("https") == 0){
+                tmpUrl = tmpUrl.replace('https', 'http');
+            }
             urls.push(tmpUrl);
             urlsSetting[tmpUrl] = {
                 start: (tmpArr[1] && parseInt(tmpArr[1].trim())) || 0,
